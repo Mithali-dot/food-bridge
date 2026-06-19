@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FoodBridge — Food Allocation System</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --green:#2D6A4F;--green-light:#52B788;--green-pale:#D8F3DC;
+  --amber:#E9A227;--amber-pale:#FFF3CD;
+  --coral:#E76F51;--coral-pale:#FFE8DF;
+  --navy:#1B2D45;--navy-light:#2E4A6B;
+  --cream:#FAFAF7;--white:#FFFFFF;
+  --gray:#F4F4F0;--gray-mid:#C5C5BC;--gray-dark:#6B6B62;
+  --text:#1A1A16;--text-muted:#6B6B62;
+  --font-display:'Playfair Display',serif;
+  --font-body:'DM Sans',sans-serif;
+  --radius:12px;--radius-lg:20px;
+  --shadow:0 2px 16px rgba(0,0,0,0.08);
+  --shadow-lg:0 8px 40px rgba(0,0,0,0.12);
+}
+body{font-family:var(--font-body);background:var(--cream);color:var(--text);line-height:1.6;font-size:15px}
+h1,h2,h3,h4{font-family:var(--font-display);line-height:1.25}
+
+/* NAV */
+nav{background:var(--white);border-bottom:1px solid #E8E8E2;position:sticky;top:0;z-index:100;box-shadow:0 1px 12px rgba(0,0,0,0.06)}
+.nav-inner{max-width:1100px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{font-family:var(--font-display);font-size:22px;color:var(--green);font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px}
+.logo-leaf{width:28px;height:28px;background:var(--green);border-radius:50% 50% 0 50%;display:inline-flex;align-items:center;justify-content:center}
+.logo-leaf svg{fill:white;width:14px;height:14px}
+.nav-links{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.nav-links a{font-size:13px;font-weight:500;color:var(--text-muted);text-decoration:none;padding:6px 10px;border-radius:8px;cursor:pointer;transition:all 0.15s}
+.nav-links a:hover,.nav-links a.active{color:var(--green);background:var(--green-pale)}
+.nav-btn{background:var(--green);color:white;font-size:13px;font-weight:600;padding:8px 16px;border-radius:8px;cursor:pointer;border:none;font-family:var(--font-body);transition:background 0.15s}
+.nav-btn:hover{background:#235C44}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px}
+.hamburger span{width:22px;height:2px;background:var(--text);border-radius:2px;transition:all 0.2s}
+
+/* PAGES */
+.page{display:none;min-height:calc(100vh - 64px)}
+.page.active{display:block}
+
+/* HOME */
+.hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 60%,#2D5016 100%);color:white;padding:90px 24px 80px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='1.5' fill='rgba(255,255,255,0.04)'/%3E%3C/svg%3E")}
+.hero-inner{max-width:720px;margin:0 auto;position:relative}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:100px;padding:6px 16px;font-size:13px;font-weight:500;margin-bottom:28px;color:rgba(255,255,255,0.9)}
+.hero h1{font-size:clamp(36px,5vw,58px);font-weight:700;margin-bottom:20px;color:white}
+.hero h1 span{color:var(--green-light)}
+.hero p{font-size:17px;color:rgba(255,255,255,0.75);max-width:560px;margin:0 auto 36px;font-weight:300}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-primary{background:var(--green-light);color:var(--navy);font-weight:700;padding:14px 28px;border-radius:10px;cursor:pointer;border:none;font-family:var(--font-body);font-size:15px;transition:all 0.15s}
+.btn-primary:hover{background:#45A37A;transform:translateY(-1px)}
+.btn-outline{background:transparent;color:white;border:2px solid rgba(255,255,255,0.4);font-weight:600;padding:13px 28px;border-radius:10px;cursor:pointer;font-family:var(--font-body);font-size:15px;transition:all 0.15s}
+.btn-outline:hover{border-color:white;background:rgba(255,255,255,0.08)}
+
+.stats-bar{background:var(--white);padding:32px 24px;border-bottom:1px solid #EEEEE8}
+.stats-inner{max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:24px;text-align:center}
+.stat-item .num{font-family:var(--font-display);font-size:36px;font-weight:700;color:var(--green)}
+.stat-item .label{font-size:13px;color:var(--text-muted);margin-top:2px}
+
+.section{padding:70px 24px;max-width:1100px;margin:0 auto}
+.section-title{text-align:center;margin-bottom:48px}
+.section-title h2{font-size:clamp(28px,3.5vw,40px);color:var(--navy);margin-bottom:10px}
+.section-title p{color:var(--text-muted);font-size:16px;max-width:500px;margin:0 auto}
+
+.how-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px}
+.how-card{background:var(--white);border:1px solid #E8E8E2;border-radius:var(--radius-lg);padding:32px 24px;text-align:center;transition:box-shadow 0.2s}
+.how-card:hover{box-shadow:var(--shadow-lg)}
+.how-icon{width:60px;height:60px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:26px}
+.how-card h3{font-size:18px;color:var(--navy);margin-bottom:10px}
+.how-card p{font-size:14px;color:var(--text-muted)}
+.icon-green{background:var(--green-pale)}
+.icon-amber{background:var(--amber-pale)}
+.icon-coral{background:var(--coral-pale)}
+.icon-navy{background:#E8EEF5}
+
+.role-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.role-card{border-radius:var(--radius-lg);padding:32px;color:white;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s}
+.role-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.role-card.restaurant{background:linear-gradient(135deg,var(--green),#1B5C38)}
+.role-card.receiver{background:linear-gradient(135deg,var(--navy-light),var(--navy))}
+.role-card.volunteer{background:linear-gradient(135deg,var(--amber),#C07A0A)}
+.role-card h3{font-size:22px;margin-bottom:10px}
+.role-card p{font-size:14px;opacity:0.85;margin-bottom:20px}
+.role-card .go-btn{display:inline-block;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer}
+
+/* FORMS */
+.form-page{max-width:560px;margin:0 auto;padding:48px 24px}
+.form-header{text-align:center;margin-bottom:36px}
+.form-header .icon-wrap{width:64px;height:64px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px}
+.form-header h2{font-size:28px;color:var(--navy)}
+.form-header p{color:var(--text-muted);font-size:14px;margin-top:6px}
+.card-form{background:var(--white);border:1px solid #E8E8E2;border-radius:var(--radius-lg);padding:32px;box-shadow:var(--shadow)}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:6px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:11px 14px;border:1.5px solid #DDDDD6;border-radius:10px;font-family:var(--font-body);font-size:14px;color:var(--text);background:var(--cream);outline:none;transition:border-color 0.15s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--green-light);background:white}
+.form-group textarea{resize:vertical;min-height:90px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.btn-submit{width:100%;background:var(--green);color:white;border:none;padding:14px;border-radius:10px;font-family:var(--font-body);font-size:15px;font-weight:600;cursor:pointer;margin-top:8px;transition:background 0.15s}
+.btn-submit:hover{background:#235C44}
+.btn-submit.amber{background:var(--amber)}
+.btn-submit.amber:hover{background:#C07A0A}
+.btn-submit.navy{background:var(--navy)}
+.btn-submit.navy:hover{background:#141F30}
+.form-switch{text-align:center;margin-top:16px;font-size:13px;color:var(--text-muted)}
+.form-switch a{color:var(--green);font-weight:600;cursor:pointer}
+.tabs{display:flex;gap:4px;background:var(--gray);border-radius:10px;padding:4px;margin-bottom:28px}
+.tab{flex:1;text-align:center;padding:9px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.15s;color:var(--text-muted)}
+.tab.active{background:var(--white);color:var(--green);box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+
+/* DASHBOARD */
+.dashboard-wrap{max-width:1100px;margin:0 auto;padding:36px 24px}
+.dashboard-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:gap}
+.dashboard-header h2{font-size:26px;color:var(--navy)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:100px;font-size:12px;font-weight:600}
+.badge-green{background:var(--green-pale);color:#1A5C38}
+.badge-amber{background:var(--amber-pale);color:#7A520A}
+.badge-coral{background:var(--coral-pale);color:#8B3820}
+.badge-gray{background:var(--gray);color:var(--gray-dark)}
+.badge-navy{background:#E8EEF5;color:var(--navy)}
+
+.metric-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:28px}
+.metric-card{background:var(--white);border:1px solid #E8E8E2;border-radius:var(--radius);padding:20px}
+.metric-card .m-num{font-family:var(--font-display);font-size:32px;font-weight:700;color:var(--green)}
+.metric-card .m-label{font-size:12px;color:var(--text-muted);margin-top:2px}
+.metric-card .m-icon{float:right;font-size:24px;opacity:0.3}
+
+.food-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.food-card{background:var(--white);border:1px solid #E8E8E2;border-radius:var(--radius-lg);overflow:hidden;transition:box-shadow 0.2s}
+.food-card:hover{box-shadow:var(--shadow-lg)}
+.food-img{height:140px;background:linear-gradient(135deg,var(--green-pale),#B7E4C7);display:flex;align-items:center;justify-content:center;font-size:48px;position:relative}
+.food-tag{position:absolute;top:10px;left:10px}
+.food-body{padding:16px}
+.food-body h4{font-size:16px;color:var(--navy);margin-bottom:4px}
+.food-meta{font-size:12px;color:var(--text-muted);margin-bottom:10px}
+.food-meta span{margin-right:8px}
+.food-footer{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid #EEEEE8}
+.food-footer .restaurant{font-size:12px;color:var(--text-muted)}
+.btn-sm{padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:var(--font-body);transition:all 0.15s}
+.btn-green{background:var(--green);color:white}
+.btn-green:hover{background:#235C44}
+.btn-outline-sm{background:transparent;color:var(--green);border:1.5px solid var(--green);padding:6px 13px}
+.btn-outline-sm:hover{background:var(--green-pale)}
+
+/* TABLE */
+.table-wrap{background:var(--white);border:1px solid #E8E8E2;border-radius:var(--radius-lg);overflow:hidden;margin-bottom:24px}
+.table-head{padding:16px 20px;border-bottom:1px solid #EEEEE8;display:flex;align-items:center;justify-content:space-between}
+.table-head h3{font-size:16px;color:var(--navy)}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:12px 16px;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #EEEEE8;background:var(--gray)}
+td{padding:12px 16px;font-size:13px;color:var(--text);border-bottom:1px solid #EEEEE8}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FAFAF2}
+
+/* TRACKING */
+.tracking-wrap{max-width:700px;margin:0 auto;padding:48px 24px}
+.tracking-card{background:var(--white);border:1px solid #E8E8E2;border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow)}
+.tracking-top{background:var(--navy);color:white;padding:24px}
+.tracking-top h3{font-size:20px;margin-bottom:4px}
+.tracking-top p{font-size:13px;opacity:0.7}
+.tracking-body{padding:24px}
+.timeline{position:relative;padding-left:32px}
+.timeline::before{content:'';position:absolute;left:11px;top:6px;bottom:6px;width:2px;background:#E8E8E2}
+.tl-step{position:relative;margin-bottom:24px}
+.tl-step:last-child{margin-bottom:0}
+.tl-dot{position:absolute;left:-32px;top:4px;width:22px;height:22px;border-radius:50%;border:3px solid #E8E8E2;background:var(--white);display:flex;align-items:center;justify-content:center}
+.tl-dot.done{background:var(--green);border-color:var(--green)}
+.tl-dot.done::after{content:'✓';font-size:10px;color:white;font-weight:700}
+.tl-dot.active{background:var(--amber);border-color:var(--amber);animation:pulse 1.5s infinite}
+.tl-dot.active::after{content:'';width:6px;height:6px;background:white;border-radius:50%}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(233,162,39,0.4)}50%{box-shadow:0 0 0 8px rgba(233,162,39,0)}}
+.tl-content h4{font-size:14px;font-weight:600;color:var(--navy)}
+.tl-content p{font-size:12px;color:var(--text-muted);margin-top:2px}
+
+/* ADMIN */
+.admin-layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 64px)}
+.admin-sidebar{background:var(--navy);color:white;padding:24px 0}
+.sidebar-logo{padding:0 20px 24px;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:16px}
+.sidebar-logo span{font-family:var(--font-display);font-size:18px}
+.sidebar-link{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:14px;font-weight:500;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.15s}
+.sidebar-link:hover,.sidebar-link.active{background:rgba(255,255,255,0.08);color:white}
+.sidebar-link .icon{font-size:16px;width:20px;text-align:center}
+.admin-main{background:var(--gray);padding:32px}
+
+/* ABOUT */
+.about-hero{background:var(--white);padding:70px 24px;text-align:center;border-bottom:1px solid #E8E8E2}
+.about-hero h1{font-size:clamp(32px,4vw,48px);color:var(--navy);margin-bottom:14px}
+.about-hero p{color:var(--text-muted);max-width:600px;margin:0 auto;font-size:16px}
+.about-grid{max-width:900px;margin:0 auto;padding:60px 24px}
+.about-section{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-bottom:60px}
+.about-section.reverse{direction:rtl}
+.about-section.reverse > *{direction:ltr}
+.about-visual{height:220px;border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;font-size:72px}
+.av-green{background:var(--green-pale)}
+.av-navy{background:#E8EEF5}
+.av-amber{background:var(--amber-pale)}
+.about-text h3{font-size:24px;color:var(--navy);margin-bottom:12px}
+.about-text p{color:var(--text-muted);font-size:15px}
+
+/* CONTACT */
+.contact-wrap{max-width:900px;margin:0 auto;padding:60px 24px}
+.contact-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:32px}
+.contact-info{background:var(--navy);border-radius:var(--radius-lg);padding:36px;color:white}
+.contact-info h3{font-size:22px;margin-bottom:8px}
+.contact-info p{font-size:14px;opacity:0.75;margin-bottom:28px}
+.contact-item{display:flex;align-items:flex-start;gap:12px;margin-bottom:20px}
+.contact-item .ci-icon{font-size:18px;margin-top:2px}
+.contact-item h4{font-size:13px;font-weight:600;margin-bottom:2px}
+.contact-item p{font-size:13px;opacity:0.7}
+.contact-form{background:var(--white);border:1px solid #E8E8E2;border-radius:var(--radius-lg);padding:36px;box-shadow:var(--shadow)}
+
+/* ALERT */
+.alert{padding:14px 18px;border-radius:10px;font-size:14px;margin-bottom:16px;display:flex;align-items:flex-start;gap:10px}
+.alert-success{background:#D8F3DC;color:#1A5C38;border:1px solid #B7E4C7}
+.alert-info{background:#E8EEF5;color:var(--navy);border:1px solid #C5D4E8}
+.alert-warn{background:var(--amber-pale);color:#7A520A;border:1px solid #F5D99A}
+
+/* FOOTER */
+footer{background:var(--navy);color:rgba(255,255,255,0.7);text-align:center;padding:32px 24px;font-size:13px;margin-top:60px}
+footer span{color:var(--green-light)}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;padding:24px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--white);border-radius:var(--radius-lg);padding:32px;max-width:420px;width:100%;box-shadow:var(--shadow-lg)}
+.modal h3{font-size:20px;color:var(--navy);margin-bottom:8px}
+.modal p{font-size:14px;color:var(--text-muted);margin-bottom:24px}
+.modal-btns{display:flex;gap:10px;justify-content:flex-end}
+.btn-cancel{padding:9px 18px;border:1.5px solid #DDDDD6;border-radius:8px;font-family:var(--font-body);font-size:14px;cursor:pointer;background:white;color:var(--text)}
+.btn-confirm{padding:9px 18px;border:none;border-radius:8px;background:var(--green);color:white;font-family:var(--font-body);font-size:14px;font-weight:600;cursor:pointer}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .hamburger{display:flex}
+  .nav-links{display:none;position:absolute;top:64px;left:0;right:0;background:var(--white);border-bottom:1px solid #E8E8E2;flex-direction:column;padding:12px;gap:4px;box-shadow:var(--shadow)}
+  .nav-links.open{display:flex}
+  .admin-layout{grid-template-columns:1fr}
+  .admin-sidebar{display:none}
+  .about-section,.contact-grid{grid-template-columns:1fr}
+  .about-section.reverse{direction:ltr}
+  .form-row{grid-template-columns:1fr}
+}
+.search-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.search-bar input{flex:1;min-width:160px;padding:10px 14px;border:1.5px solid #DDDDD6;border-radius:10px;font-family:var(--font-body);font-size:14px;outline:none;transition:border-color 0.15s}
+.search-bar input:focus{border-color:var(--green-light)}
+.search-bar select{padding:10px 14px;border:1.5px solid #DDDDD6;border-radius:10px;font-family:var(--font-body);font-size:14px;outline:none;background:white}
+.filter-btn{padding:10px 16px;background:var(--green);color:white;border:none;border-radius:10px;font-family:var(--font-body);font-size:14px;font-weight:600;cursor:pointer}
+.empty-state{text-align:center;padding:60px 24px;color:var(--text-muted)}
+.empty-state .icon{font-size:48px;margin-bottom:12px}
+.empty-state p{font-size:15px}
+.section-full{padding:40px 24px;max-width:1100px;margin:0 auto}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="logo" onclick="showPage('home')">
+      <div class="logo-leaf"><svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 19.15L5.71 21l1-1.15C7.15 19.27 9.5 18 12 18c5 0 9-4 9-9-1 0-3 1-4 2z"/></svg></div>
+      FoodBridge
+    </div>
+    <div class="nav-links" id="navLinks">
+      <a onclick="showPage('home')" class="active" id="nav-home">Home</a>
+      <a onclick="showPage('about')" id="nav-about">About</a>
+      <a onclick="showPage('dashboard')" id="nav-dashboard">Food Board</a>
+      <a onclick="showPage('tracking')" id="nav-tracking">Tracking</a>
+      <a onclick="showPage('contact')" id="nav-contact">Contact</a>
+      <a onclick="showPage('admin-login')" id="nav-admin" style="color:var(--coral)">Admin</a>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="nav-btn" onclick="showPage('restaurant-auth')">Restaurant</button>
+      <button class="nav-btn" style="background:var(--navy)" onclick="showPage('receiver-auth')">Receiver</button>
+      <div class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ==================== HOME ==================== -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="hero-badge">🌱 Zero Hunger, Zero Waste</div>
+      <h1>Connecting <span>Surplus Food</span><br>to Those Who Need It</h1>
+      <p>FoodBridge is a real-time platform that links restaurants with NGOs, orphanages, and ashrams to redirect leftover food safely and efficiently — before it goes to waste.</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="showPage('restaurant-auth')">🍽️ I'm a Restaurant</button>
+        <button class="btn-outline" onclick="showPage('receiver-auth')">🏠 I'm a Receiver Org</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stats-inner">
+      <div class="stat-item"><div class="num" id="homeMeals">0</div><div class="label">Meals Donated</div></div>
+      <div class="stat-item"><div class="num" id="homeRests">0</div><div class="label">Partner Restaurants</div></div>
+      <div class="stat-item"><div class="num" id="homeOrgs">0</div><div class="label">Receiver Orgs</div></div>
+      <div class="stat-item"><div class="num" id="homeVols">0</div><div class="label">Active Volunteers</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><h2>How It Works</h2><p>A simple 4-step process to get food from kitchen to community</p></div>
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="how-icon icon-green">🍛</div>
+        <h3>Restaurant Lists Food</h3>
+        <p>Restaurants upload leftover details — quantity, food type, expiry time, and pickup location.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-icon icon-navy">🔍</div>
+        <h3>NGO Discovers</h3>
+        <p>Receiver organizations browse the food board and send a pickup request for available items.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-icon icon-amber">🚴</div>
+        <h3>Volunteer Delivers</h3>
+        <p>A verified volunteer picks up the food and delivers it, updating status at every step.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-icon icon-coral">✅</div>
+        <h3>Impact Recorded</h3>
+        <p>Admin logs the completed donation. Both parties receive confirmation and the data feeds our impact tracker.</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:var(--white);padding:70px 24px;border-top:1px solid #E8E8E2;border-bottom:1px solid #E8E8E2">
+    <div class="section-title"><h2>Join the Network</h2><p>Pick your role and start making a difference today</p></div>
+    <div style="max-width:900px;margin:0 auto" class="role-cards">
+      <div class="role-card restaurant" onclick="showPage('restaurant-auth')">
+        <h3>🍽️ Restaurant</h3>
+        <p>List your surplus food in minutes and let verified organizations collect it safely.</p>
+        <div class="go-btn">Register / Login →</div>
+      </div>
+      <div class="role-card receiver" onclick="showPage('receiver-auth')">
+        <h3>🏠 Receiver Org</h3>
+        <p>NGOs, orphanages, and ashrams can browse available food and raise pickup requests.</p>
+        <div class="go-btn">Register / Login →</div>
+      </div>
+      <div class="role-card volunteer" onclick="showPage('volunteer-reg')">
+        <h3>🚴 Volunteer</h3>
+        <p>Help us deliver food and create real community impact with just a few hours a week.</p>
+        <div class="go-btn">Sign Up →</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><h2>Database Schema</h2><p>Tables stored in the FoodBridge DBMS</p></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px">
+      <div class="table-wrap" style="margin:0">
+        <div class="table-head" style="background:var(--green-pale)"><h3 style="color:var(--green);font-size:14px">📋 Restaurants</h3></div>
+        <div style="padding:14px 16px;font-size:12px;color:var(--text-muted)">
+          <div style="margin-bottom:6px">🔑 restaurant_id (PK)</div>
+          <div>name, owner_name, email, phone</div>
+          <div>address, city, fssai_no</div>
+          <div>password_hash, status, created_at</div>
+        </div>
+      </div>
+      <div class="table-wrap" style="margin:0">
+        <div class="table-head" style="background:#E8EEF5"><h3 style="color:var(--navy);font-size:14px">🏠 Receiver Orgs</h3></div>
+        <div style="padding:14px 16px;font-size:12px;color:var(--text-muted)">
+          <div style="margin-bottom:6px">🔑 receiver_id (PK)</div>
+          <div>org_name, org_type, rep_name</div>
+          <div>email, phone, address, city</div>
+          <div>reg_no, password_hash, status</div>
+        </div>
+      </div>
+      <div class="table-wrap" style="margin:0">
+        <div class="table-head" style="background:var(--amber-pale)"><h3 style="color:#7A520A;font-size:14px">🚴 Volunteers</h3></div>
+        <div style="padding:14px 16px;font-size:12px;color:var(--text-muted)">
+          <div style="margin-bottom:6px">🔑 volunteer_id (PK)</div>
+          <div>name, email, phone, city</div>
+          <div>vehicle_type, availability</div>
+          <div>status, registered_at</div>
+        </div>
+      </div>
+      <div class="table-wrap" style="margin:0">
+        <div class="table-head" style="background:var(--coral-pale)"><h3 style="color:#8B3820;font-size:14px">🍛 Food Donations</h3></div>
+        <div style="padding:14px 16px;font-size:12px;color:var(--text-muted)">
+          <div style="margin-bottom:6px">🔑 donation_id (PK)</div>
+          <div>🔗 restaurant_id (FK)</div>
+          <div>food_name, quantity, food_type</div>
+          <div>prep_time, expiry_time, status</div>
+        </div>
+      </div>
+      <div class="table-wrap" style="margin:0">
+        <div class="table-head" style="background:var(--gray)"><h3 style="font-size:14px">📦 Deliveries</h3></div>
+        <div style="padding:14px 16px;font-size:12px;color:var(--text-muted)">
+          <div style="margin-bottom:6px">🔑 delivery_id (PK)</div>
+          <div>🔗 donation_id, volunteer_id</div>
+          <div>🔗 receiver_id (all FK)</div>
+          <div>status, pickup_time, delivered_at</div>
+        </div>
+      </div>
+      <div class="table-wrap" style="margin:0">
+        <div class="table-head" style="background:var(--gray)"><h3 style="font-size:14px">🔐 Admin</h3></div>
+        <div style="padding:14px 16px;font-size:12px;color:var(--text-muted)">
+          <div style="margin-bottom:6px">🔑 admin_id (PK)</div>
+          <div>username, email</div>
+          <div>password_hash, role</div>
+          <div>last_login, created_at</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>© 2024 FoodBridge — DBMS Mini Project &nbsp;|&nbsp; Developed with ❤️ for <span>Zero Hunger</span></footer>
+</div>
+
+<!-- ==================== ABOUT ==================== -->
+<div class="page" id="page-about">
+  <div class="about-hero">
+    <h1>About FoodBridge</h1>
+    <p>A DBMS mini-project designed to reduce food waste and feed communities by creating an intelligent distribution network.</p>
+  </div>
+  <div class="about-grid">
+    <div class="about-section">
+      <div class="about-visual av-green">🌾</div>
+      <div class="about-text">
+        <h3>The Problem We Solve</h3>
+        <p>Every day, tonnes of perfectly edible food is discarded by restaurants while thousands in the same city go hungry. FoodBridge creates a digital bridge between these two worlds using real-time data and community volunteers.</p>
+      </div>
+    </div>
+    <div class="about-section reverse">
+      <div class="about-visual av-navy">🎯</div>
+      <div class="about-text">
+        <h3>Project Objective</h3>
+        <p>This project demonstrates a relational database system with multiple user roles, CRUD operations, relational integrity (foreign keys), and real-time status tracking — built as a Second Year DBMS Mini Project.</p>
+      </div>
+    </div>
+    <div class="about-section">
+      <div class="about-visual av-amber">🤝</div>
+      <div class="about-text">
+        <h3>Community Impact</h3>
+        <p>By connecting restaurants, NGOs, and volunteers on a single platform, FoodBridge streamlines the donation workflow — reducing food waste while ensuring safe, timely delivery to those in need.</p>
+      </div>
+    </div>
+  </div>
+  <div style="background:var(--navy);color:white;padding:48px 24px;text-align:center">
+    <h2 style="font-family:var(--font-display);font-size:28px;margin-bottom:10px">Technologies Used</h2>
+    <p style="opacity:0.7;margin-bottom:28px">Built with standard web and database technologies</p>
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px;max-width:600px;margin:0 auto">
+      <span class="badge badge-green" style="font-size:14px;padding:8px 16px">MySQL / SQL</span>
+      <span class="badge badge-navy" style="font-size:14px;padding:8px 16px;background:rgba(255,255,255,0.15);color:white">HTML5 / CSS3</span>
+      <span class="badge badge-amber" style="font-size:14px;padding:8px 16px">JavaScript</span>
+      <span class="badge" style="font-size:14px;padding:8px 16px;background:var(--coral-pale);color:#8B3820">PHP / Node.js</span>
+      <span class="badge badge-gray" style="font-size:14px;padding:8px 16px">Relational DBMS</span>
+      <span class="badge badge-green" style="font-size:14px;padding:8px 16px">CRUD Operations</span>
+    </div>
+  </div>
+  <footer>© 2024 FoodBridge — DBMS Mini Project &nbsp;|&nbsp; Developed with ❤️ for <span>Zero Hunger</span></footer>
+</div>
+
+<!-- ==================== RESTAURANT AUTH ==================== -->
+<div class="page" id="page-restaurant-auth">
+  <div class="form-page">
+    <div class="form-header">
+      <div class="icon-wrap icon-green" style="background:var(--green-pale)">🍽️</div>
+      <h2>Restaurant Portal</h2>
+      <p>Register your restaurant or log in to manage food donations</p>
+    </div>
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('r','login')">Login</div>
+      <div class="tab" onclick="switchTab('r','register')">Register</div>
+    </div>
+
+    <div id="r-login" class="card-form">
+      <form onsubmit="event.preventDefault(); doLogin('login_restaurant', this);">
+      <div class="form-group"><label>Email Address</label><input type="email" name="email" required placeholder="restaurant@example.com"></div>
+      <div class="form-group"><label>Password</label><input type="password" name="password" required placeholder="••••••••"></div>
+      <button type="submit" class="btn-submit">Login to Dashboard</button>
+      <div class="form-switch">Don't have an account? <a onclick="switchTab('r','register')">Register here</a></div>
+      </form>
+    </div>
+
+    <div id="r-register" class="card-form" style="display:none">
+      <form onsubmit="event.preventDefault(); doRegister('register_restaurant', this);">
+      <div class="form-group"><label>Restaurant Name</label><input type="text" name="name" required placeholder="e.g. Spice Garden Restaurant"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Owner Name</label><input type="text" name="owner_name" required placeholder="Full name"></div>
+        <div class="form-group"><label>FSSAI License No.</label><input type="text" name="fssai_no" required placeholder="FSSAI number"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Email</label><input type="email" name="email" required placeholder="email@restaurant.com"></div>
+        <div class="form-group"><label>Phone</label><input type="tel" name="phone" required placeholder="+91 XXXXX XXXXX"></div>
+      </div>
+      <div class="form-group"><label>Full Address</label><textarea name="address" required placeholder="Street address, landmark, city..."></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>City</label><input type="text" name="city" required placeholder="Your city"></div>
+        <div class="form-group"><label>Pincode</label><input type="text" name="pincode" placeholder="560001"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Password</label><input type="password" name="password" required placeholder="Create password"></div>
+        <div class="form-group"><label>Confirm Password</label><input type="password" placeholder="Repeat password"></div>
+      </div>
+      <button type="submit" class="btn-submit">Register Restaurant</button>
+      <div class="form-switch">Already registered? <a onclick="switchTab('r','login')">Login here</a></div>
+      </form>
+    </div>
+  </div>
+  <footer>© 2024 FoodBridge &nbsp;|&nbsp; <span>Zero Hunger</span></footer>
+</div>
+
+<!-- ==================== RECEIVER AUTH ==================== -->
+<div class="page" id="page-receiver-auth">
+  <div class="form-page">
+    <div class="form-header">
+      <div class="icon-wrap" style="background:#E8EEF5">🏠</div>
+      <h2>Receiver Org Portal</h2>
+      <p>For NGOs, orphanages, and ashrams to access food donations</p>
+    </div>
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('o','login')">Login</div>
+      <div class="tab" onclick="switchTab('o','register')">Register</div>
+    </div>
+
+    <div id="o-login" class="card-form">
+      <form onsubmit="event.preventDefault(); doLogin('login_receiver', this);">
+      <div class="form-group"><label>Email Address</label><input type="email" name="email" required placeholder="ngo@example.org"></div>
+      <div class="form-group"><label>Password</label><input type="password" name="password" required placeholder="••••••••"></div>
+      <button type="submit" class="btn-submit navy">Login to Dashboard</button>
+      <div class="form-switch">Not registered? <a onclick="switchTab('o','register')">Register your organization</a></div>
+      </form>
+    </div>
+
+    <div id="o-register" class="card-form" style="display:none">
+      <form onsubmit="event.preventDefault(); doRegister('register_receiver', this);">
+      <div class="form-group"><label>Organization Name</label><input type="text" name="org_name" required placeholder="e.g. Helping Hands NGO"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Organization Type</label>
+          <select name="org_type"><option>NGO</option><option>Orphanage</option><option>Ashram</option><option>Old Age Home</option><option>School / Trust</option></select>
+        </div>
+        <div class="form-group"><label>Registration No.</label><input type="text" name="reg_no" required placeholder="Govt reg number"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Representative Name</label><input type="text" name="rep_name" required placeholder="Full name"></div>
+        <div class="form-group"><label>Designation</label><input type="text" name="designation" placeholder="e.g. Director, Coordinator"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Email</label><input type="email" name="email" required placeholder="org@ngo.org"></div>
+        <div class="form-group"><label>Phone</label><input type="tel" name="phone" required placeholder="+91 XXXXX XXXXX"></div>
+      </div>
+      <div class="form-group"><label>Address</label><textarea name="address" required placeholder="Full address of your organization..."></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>City</label><input type="text" name="city" required placeholder="City"></div>
+        <div class="form-group"><label>Beneficiaries Count</label><input type="number" name="beneficiaries" placeholder="e.g. 120"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Password</label><input type="password" name="password" required placeholder="Create password"></div>
+        <div class="form-group"><label>Confirm Password</label><input type="password" placeholder="Repeat password"></div>
+      </div>
+      <button type="submit" class="btn-submit navy">Register Organization</button>
+      <div class="form-switch">Already have an account? <a onclick="switchTab('o','login')">Login here</a></div>
+      </form>
+    </div>
+  </div>
+  <footer>© 2024 FoodBridge &nbsp;|&nbsp; <span>Zero Hunger</span></footer>
+</div>
+
+<!-- ==================== VOLUNTEER REG ==================== -->
+<div class="page" id="page-volunteer-reg">
+  <div class="form-page">
+    <div class="form-header">
+      <div class="icon-wrap" style="background:var(--amber-pale)">🚴</div>
+      <h2>Volunteer Registration</h2>
+      <p>Join our delivery team and help food reach those who need it</p>
+    </div>
+    <div class="card-form">
+      <form onsubmit="event.preventDefault(); doRegister('register_volunteer', this);">
+      <div class="alert alert-success">✅ Join our delivery team and start helping right away!</div>
+      <div class="form-row">
+        <div class="form-group"><label>First Name</label><input type="text" name="first_name" required placeholder="First name"></div>
+        <div class="form-group"><label>Last Name</label><input type="text" name="last_name" required placeholder="Last name"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Email</label><input type="email" name="email" required placeholder="your@email.com"></div>
+        <div class="form-group"><label>Phone</label><input type="tel" name="phone" required placeholder="+91 XXXXX XXXXX"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>City</label><input type="text" name="city" required placeholder="City"></div>
+        <div class="form-group"><label>Aadhar / ID No.</label><input type="text" name="aadhar_no" required placeholder="For verification"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Vehicle Type</label>
+          <select name="vehicle_type"><option>Bicycle</option><option>Two-Wheeler</option><option>Car</option><option>Auto Rickshaw</option><option>Walk (Nearby only)</option></select>
+        </div>
+        <div class="form-group"><label>Availability</label>
+          <select name="availability"><option>Weekdays</option><option>Weekends</option><option>Anytime</option><option>Mornings only</option><option>Evenings only</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label>About Yourself</label><textarea name="about" placeholder="Brief note about why you want to volunteer..."></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>Password</label><input type="password" name="password" required placeholder="Create password"></div>
+        <div class="form-group"><label>Confirm Password</label><input type="password" placeholder="Repeat password"></div>
+      </div>
+      <button type="submit" class="btn-submit amber">Register as Volunteer</button>
+      </form>
+    </div>
+  </div>
+  <footer>© 2024 FoodBridge &nbsp;|&nbsp; <span>Zero Hunger</span></footer>
+</div>
+
+<!-- ==================== FOOD DONATION FORM ==================== -->
+<div class="page" id="page-donate">
+  <div class="form-page" style="max-width:680px">
+    <div class="form-header">
+      <div class="icon-wrap icon-green" style="background:var(--green-pale)">🍛</div>
+      <h2>Submit Food Donation</h2>
+      <p>List your surplus food so nearby organizations can request it</p>
+    </div>
+    <div class="card-form">
+      <form onsubmit="event.preventDefault(); doPostDonation(this);">
+      <div class="alert alert-warn">⏰ Only list food that is safe to consume and within expiry time</div>
+      <div class="form-row">
+        <div class="form-group"><label>Food Name / Description</label><input type="text" name="food_name" required placeholder="e.g. Biryani, Dal Rice, Chapati"></div>
+        <div class="form-group"><label>Quantity (Servings)</label><input type="number" name="quantity" required placeholder="e.g. 50"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Food Type</label>
+          <select name="food_type"><option>Vegetarian</option><option>Non-Vegetarian</option><option>Vegan</option><option>Jain</option></select>
+        </div>
+        <div class="form-group"><label>Packaging</label>
+          <select name="packaging"><option>Packed in containers</option><option>Loose / Bulk</option><option>Sealed packets</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Preparation Time</label><input type="datetime-local" name="prep_time" required></div>
+        <div class="form-group"><label>Safe Until (Expiry)</label><input type="datetime-local" name="expiry_time" required></div>
+      </div>
+      <div class="form-group"><label>Pickup Address</label><textarea name="pickup_address" required placeholder="Specific address for food pickup..." style="min-height:70px"></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>City</label><input type="text" name="city" required placeholder="City"></div>
+        <div class="form-group"><label>Pickup Contact Number</label><input type="tel" name="pickup_phone" required placeholder="+91 XXXXX XXXXX"></div>
+      </div>
+      <div class="form-group"><label>Special Instructions</label><textarea name="special_instructions" placeholder="Allergies, temperature notes..." style="min-height:70px"></textarea></div>
+      <button type="submit" class="btn-submit">Post Food Donation</button>
+      </form>
+    </div>
+  </div>
+  <footer>© 2024 FoodBridge &nbsp;|&nbsp; <span>Zero Hunger</span></footer>
+</div>
+
+<!-- ==================== FOOD DASHBOARD ==================== -->
+<div class="page" id="page-dashboard">
+  <div class="dashboard-wrap">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+      <div><h2 style="font-family:var(--font-display);font-size:26px;color:var(--navy)">Food Availability Board</h2><p style="color:var(--text-muted);font-size:14px">Browse available donations near you</p></div>
+      <button class="btn-green btn-sm" style="padding:10px 18px" onclick="showPage('donate')">+ Post Donation</button>
+    </div>
+
+    <div class="metric-row">
+      <div class="metric-card"><span class="m-icon">🍛</span><div class="m-num" id="statActive">0</div><div class="m-label">Available Now</div></div>
+      <div class="metric-card"><span class="m-icon">⏳</span><div class="m-num" id="statRequested">0</div><div class="m-label">Requested</div></div>
+      <div class="metric-card"><span class="m-icon">✅</span><div class="m-num" id="statCompleted">0</div><div class="m-label">Completed Today</div></div>
+      <div class="metric-card"><span class="m-icon">🚴</span><div class="m-num" id="statEnroute">0</div><div class="m-label">En Route</div></div>
+    </div>
+
+    <div class="search-bar">
+      <input type="text" id="foodSearch" placeholder="Search by food name or restaurant..." oninput="filterFoods()">
+      <select id="typeFilter" onchange="filterFoods()"><option value="">All Types</option><option value="Vegetarian">Vegetarian</option><option value="Non-Vegetarian">Non-Veg</option><option value="Vegan">Vegan</option></select>
+      <select id="cityFilter" onchange="filterFoods()"><option value="">All Cities</option><option value="Mangaluru">Mangaluru</option><option value="Bangalore">Bangalore</option><option value="Mysuru">Mysuru</option></select>
+      <button class="filter-btn" onclick="filterFoods()">Filter</button>
+    </div>
+
+    <div class="food-grid" id="foodGrid"></div>
+  </div>
+  <footer>© 2024 FoodBridge &nbsp;|&nbsp; <span>Zero Hunger</span></footer>
+</div>
+
+<!-- ==================== FOOD REQUEST ==================== -->
+<div class="page" id="page-request">
+  <div class="form-page" style="max-width:620px">
+    <div class="form-header">
+      <div class="icon-wrap" style="background:#E8EEF5">📥</div>
+      <h2>Request Food Donation</h2>
+      <p id="requestFoodTitle">Submit a request for the selected food donation</p>
+    </div>
+    <div class="card-form">
+      <form onsubmit="event.preventDefault(); doRequestFood(this);">
+      <input type="hidden" id="reqDonationId" name="donation_id">
+      <div id="requestFoodInfo" style="background:var(--green-pale);border-radius:10px;padding:14px 16px;margin-bottom:18px">
+        <strong style="color:var(--green);font-size:14px">Selected Food</strong>
+        <div id="requestFoodDetails" style="font-size:13px;color:var(--text-muted);margin-top:4px"></div>
+      </div>
+      <div class="form-group"><label>Organization Name</label><input type="text" required placeholder="Your registered org name"></div>
+      <div class="form-group"><label>Representative Name</label><input type="text" required placeholder="Authorized representative"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Contact Number</label><input type="tel" required placeholder="Phone"></div>
+        <div class="form-group"><label>No. of Beneficiaries</label><input type="number" required placeholder="People to serve"></div>
+      </div>
+      <div class="form-group"><label>Pickup / Delivery Preference</label>
+        <select><option>Self Pickup</option><option>Volunteer Delivery Needed</option></select>
+      </div>
+      <div class="form-group"><label>Delivery Address</label><textarea required placeholder="Where should the food be delivered?"></textarea></div>
+      <div class="form-group"><label>Additional Notes</label><textarea placeholder="Special requirements, dietary restrictions, urgency..."></textarea></div>
+      <button type="submit" class="btn-submit navy">Submit Request</button>
+      </form>
+    </div>
+  </div>
+  <footer>© 2024 FoodBridge &nbsp;|&nbsp; <span>Zero Hunger</span></footer>
+</div>
+
+<!-- ==================== TRACKING ==================== -->
+<div class="page" id="page-tracking">
+  <div class="tracking-wrap">
+    <div style="text-align:center;margin-bottom:32px">
+      <h2 style="font-family:var(--font-display);font-size:28px;color:var(--navy)">Delivery Tracking</h2>
+      <p style="color:var(--text-muted)">Enter your donation or delivery ID to track status</p>
+    </div>
+    <div class="search-bar" style="max-width:500px;margin:0 auto 32px">
+      <input type="text" placeholder="Enter Donation ID (e.g. FB-2024-042)" id="trackInput">
+      <button class="filter-btn" onclick="showTracking()">Track</button>
+    </div>
+    <div id="trackingResult" style="display:none">
+      <div class="tracking-card">
+        <div class="tracking-top">
+          <h3>🍛 Biryani & Salad — 80 Servings</h3>
+          <p>Donation ID: FB-2024-042 &nbsp;|&nbsp; Spice Garden Restaurant → Helping Hands NGO</p>
+        </div>
+        <div class="tracking-body">
+          <div style="display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap">
+            <div><div style="font-size:12px;color:var(--text-muted)">Volunteer</div><div style="font-weight:600;font-size:14px">Ravi Kumar</div></div>
+            <div><div style="font-size:12px;color:var(--text-muted)">Vehicle</div><div style="font-weight:600;font-size:14px">Two-Wheeler</div></div>
+            <div><div style="font-size:12px;color:var(--text-muted)">Estimated Delivery</div><div style="font-weight:600;font-size:14px">2:30 PM Today</div></div>
+            <div><span class="badge badge-amber">🚴 En Route</span></div>
+          </div>
+          <div class="timeline">
+            <div class="tl-step">
+              <div class="tl-dot done"></div>
+              <div class="tl-content"><h4>Donation Posted</h4><p>12:00 PM — Spice Garden Restaurant listed the food</p></div>
+            </div>
+            <div class="tl-step">
+              <div class="tl-dot done"></div>
+              <div class="tl-content"><h4>Request Approved</h4><p>12:30 PM — Helping Hands NGO request confirmed by Admin</p></div>
+            </div>
+            <div class="tl-step">
+              <div class="tl-dot done"></div>
+              <div class="tl-content"><h4>Volunteer Assigned</h4><p>12:45 PM — Ravi Kumar accepted the delivery</p></div>
+            </div>
+            <div class="tl-step">
+              <div class="tl-dot done"></div>
+              <div class="tl-content"><h4>Food Picked Up</h4><p>1:30 PM — Ravi picked up 80 servings from restaurant</p></div>
+            </div>
+            <div class="tl-step">
+              <div class="tl-dot active"></div>
+              <div class="tl-content"><h4>En Route to Receiver</h4><p>In progress — Estimated arrival: 2:30 PM</p></div>
+            </div>
+            <div class="tl-step">
+              <div class="tl-dot" style="background:#E8E8E2"></div>
+              <div class="tl-content" style="opacity:0.5"><h4>Delivered</h4><p>Pending</p></div>
+            </div>
+          </div>
+          <div style="margin-top:24px;padding-top:20px;border-top:1px solid #EEEEE8">
+            <button class="btn-sm btn-outline-sm" onclick="showModal('updateModal')">Update Delivery Status</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer>© 2024 FoodBridge &nbsp;|&nbsp; <span>Zero Hunger</span></footer>
+</div>
+
+<!-- ==================== ADMIN LOGIN ==================== -->
+<div class="page" id="page-admin-login">
+  <div class="form-page" style="max-width:440px">
+    <div class="form-header">
+      <div class="icon-wrap" style="background:var(--coral-pale)">🔐</div>
+      <h2>Admin Login</h2>
+      <p>Restricted access — authorized personnel only</p>
+    </div>
+    <div class="card-form">
+      <form onsubmit="event.preventDefault(); doAdminLogin(this);">
+      <div class="alert alert-warn">⚠️ Demo: Use admin@foodbridge.com / admin123</div>
+      <div class="form-group"><label>Email</label><input type="email" name="email" required placeholder="admin@foodbridge.com" id="adminUser"></div>
+      <div class="form-group"><label>Password</label><input type="password" name="password" required placeholder="••••••••" id="adminPass"></div>
+      <button type="submit" class="btn-submit" style="background:var(--coral)">Login to Admin Panel</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ADMIN DASHBOARD ==================== -->
+<div class="page" id="page-admin">
+  <div class="admin-layout">
+    <div class="admin-sidebar">
+      <div class="sidebar-logo"><span>🍃 FoodBridge Admin</span></div>
+      <div class="sidebar-link active" onclick="showAdminTab('overview')"><span class="icon">📊</span>Overview</div>
+      <div class="sidebar-link" onclick="showAdminTab('restaurants')"><span class="icon">🍽️</span>Restaurants</div>
+      <div class="sidebar-link" onclick="showAdminTab('receivers')"><span class="icon">🏠</span>Receiver Orgs</div>
+      <div class="sidebar-link" onclick="showAdminTab('volunteers')"><span class="icon">🚴</span>Volunteers</div>
+      <div class="sidebar-link" onclick="showAdminTab('donations')"><span class="icon">🍛</span>Donations</div>
+      <div class="sidebar-link" onclick="showAdminTab('deliveries')"><span class="icon">📦</span>Deliveries</div>
+      <div class="sidebar-link" style="margin-top:auto;color:var(--coral-pale)" onclick="showPage('home')"><span class="icon">↩️</span>Logout</div>
+    </div>
+    <div class="admin-main" id="adminContent">
+      <!-- Filled by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ==================== CONTACT ==================== -->
+<div class="page" id="page-contact">
+  <div style="text-align:center;padding:60px 24px 40px;background:var(--white);border-bottom:1px solid #E8E8E2">
+    <h1 style="font-family:var(--font-display);font-size:36px;color:var(--navy);margin-bottom:10px">Contact Us</h1>
+    <p style="color:var(--text-muted)">Have questions? We'd love to hear from you.</p>
+  </div>
+  <div class="contact-wrap">
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h3>Get in Touch</h3>
+        <p>We're here to help onboard restaurants, NGOs, and volunteers onto the FoodBridge network.</p>
+        <div class="contact-item"><div class="ci-icon">📍</div><div><h4>Address</h4><p>Mangaluru, Karnataka, India — 575001</p></div></div>
+        <div class="contact-item"><div class="ci-icon">📧</div><div><h4>Email</h4><p>contact@foodbridge.org</p></div></div>
+        <div class="contact-item"><div class="ci-icon">📞</div><div><h4>Phone</h4><p>+91 98765 43210</p></div></div>
+        <div class="contact-item"><div class="ci-icon">🕐</div><div><h4>Working Hours</h4><p>Mon – Sat, 8:00 AM – 8:00 PM</p></div></div>
+      </div>
+      <div class="contact-form">
+        <div class="form-group"><label>Your Name</label><input type="text" placeholder="Full name"></div>
+        <div class="form-group"><label>Email</label><input type="email" placeholder="your@email.com"></div>
+        <div class="form-group"><label>Subject</label>
+          <select><option>General Inquiry</option><option>Restaurant Onboarding</option><option>NGO Partnership</option><option>Volunteer Query</option><option>Technical Issue</option></select>
+        </div>
+        <div class="form-group"><label>Message</label><textarea placeholder="Describe your question or concern..." style="min-height:120px"></textarea></div>
+        <button class="btn-submit" onclick="showModal('contactModal')">Send Message</button>
+      </div>
+    </div>
+  </div>
+  <footer>© 2024 FoodBridge &nbsp;|&nbsp; <span>Zero Hunger</span></footer>
+</div>
+
+<!-- ==================== MODALS ==================== -->
+<div class="modal-overlay" id="regModal">
+  <div class="modal">
+    <h3>✅ Registration Successful!</h3>
+    <p>Your account has been successfully created. You can now log in to access your dashboard.</p>
+    <div class="modal-btns"><button class="btn-confirm" onclick="closeModal('regModal');showPage('home')">Back to Home</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="requestModal">
+  <div class="modal">
+    <h3>📥 Request Submitted!</h3>
+    <p>Your food request has been sent. You'll be notified once a volunteer is assigned.</p>
+    <div style="background:#f4f4f4;padding:12px;border-radius:8px;margin-bottom:20px;text-align:center;font-weight:bold;color:var(--navy);">
+      Your Tracking ID: <span id="requestModalTrackingId" style="color:var(--green)"></span>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal('requestModal')">Close</button>
+      <button class="btn-confirm" onclick="closeModal('requestModal');showPage('tracking')">Track Delivery</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="updateModal">
+  <div class="modal">
+    <h3>📦 Update Delivery Status</h3>
+    <div class="form-group" style="margin-bottom:16px"><label>New Status</label>
+      <select><option>Picked Up</option><option>En Route</option><option>Delivered</option><option>Issue Encountered</option></select>
+    </div>
+    <div class="form-group" style="margin-bottom:16px"><label>Notes</label><textarea style="min-height:70px;width:100%;padding:10px 12px;border:1.5px solid #DDDDD6;border-radius:8px;font-family:var(--font-body);font-size:14px;outline:none" placeholder="Any delivery notes..."></textarea></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal('updateModal')">Cancel</button>
+      <button class="btn-confirm" onclick="closeModal('updateModal')">Update Status</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="contactModal">
+  <div class="modal">
+    <h3>📨 Message Sent!</h3>
+    <p>Thanks for reaching out! Our team will get back to you at your email within one business day.</p>
+    <div class="modal-btns"><button class="btn-confirm" onclick="closeModal('contactModal')">Done</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="approveModal">
+  <div class="modal">
+    <h3>✅ Approved!</h3>
+    <p id="approveMsg">The user has been approved and notified via email.</p>
+    <div class="modal-btns"><button class="btn-confirm" onclick="closeModal('approveModal')">Done</button></div>
+  </div>
+</div>
+
+<script>
+
+// ─── DYNAMIC JS ───
+
+// Utility
+async function fetchPost(url, data) {
+    const formData = new FormData();
+    for (let key in data) formData.append(key, data[key]);
+    const res = await fetch(url, { method: 'POST', body: formData });
+    return await res.json();
+}
+
+async function doLogin(action, form) {
+    const data = { action };
+    new FormData(form).forEach((value, key) => data[key] = value);
+    const res = await fetchPost('api_login.php', data);
+    if (res.success) {
+        if (res.user_type === 'restaurant') showPage('donate');
+        else showPage('dashboard');
+    } else {
+        alert(res.message);
+    }
+}
+
+async function doRegister(action, form) {
+    const data = { action };
+    new FormData(form).forEach((value, key) => data[key] = value);
+    const res = await fetchPost('api_register.php', data);
+    if (res.success) {
+        showModal('regModal');
+        form.reset();
+    } else {
+        alert(res.message);
+    }
+}
+
+async function doAdminLogin(form) {
+    const data = { action: 'login_admin' };
+    new FormData(form).forEach((value, key) => data[key] = value);
+    const res = await fetchPost('api_login.php', data);
+    if (res.success) {
+        showPage('admin');
+        renderAdminOverview();
+    } else {
+        alert(res.message);
+    }
+}
+
+async function doPostDonation(form) {
+    const data = { action: 'add_donation' };
+    new FormData(form).forEach((value, key) => data[key] = value);
+    const res = await fetchPost('api_donations.php', data);
+    if (res.success) {
+        form.reset();
+        alert("Success! Your Tracking ID is: FB-2024-" + res.donation_id + "\nSave this ID to track your donation.");
+        showPage('dashboard');
+    } else {
+        alert(res.message);
+    }
+}
+
+async function doRequestFood(form) {
+    const data = { action: 'request_food', donation_id: document.getElementById('reqDonationId').value };
+    const res = await fetchPost('api_requests.php', data);
+    if (res.success) {
+        form.reset();
+        document.getElementById('requestModalTrackingId').innerText = "FB-2024-" + data.donation_id;
+        showModal('requestModal');
+    } else {
+        alert(res.message);
+    }
+}
+
+// ─── NAVIGATION ───
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  const el = document.getElementById('page-' + page);
+  if (el) el.classList.add('active');
+  const navEl = document.getElementById('nav-' + page);
+  if (navEl) navEl.classList.add('active');
+  window.scrollTo(0,0);
+  document.getElementById('navLinks').classList.remove('open');
+  if (page === 'dashboard') { loadDonations(); loadStats(); }
+  if (page === 'admin') { renderAdminOverview(); }
+}
+
+function toggleMenu() {
+  document.getElementById('navLinks').classList.toggle('open');
+}
+
+function switchTab(prefix, tab) {
+  document.querySelectorAll(`#${prefix}-login, #${prefix}-register`).forEach(el => el.style.display = 'none');
+  document.getElementById(`${prefix}-${tab}`).style.display = 'block';
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'register' && i === 1));
+  });
+}
+
+// ─── FOODS ───
+let allDonations = [];
+async function loadDonations() {
+    const res = await fetch('api_donations.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'action=get_donations'
+    });
+    const json = await res.json();
+    if (json.success) {
+        allDonations = json.data;
+        renderFoods(allDonations);
+    }
+}
+
+async function loadStats() {
+    const res = await fetch('api_donations.php?action=get_stats');
+    const json = await res.json();
+    if (json.success) {
+        document.getElementById('statActive').innerText = json.stats.active;
+        document.getElementById('statRequested').innerText = json.stats.requested;
+        document.getElementById('statCompleted').innerText = json.stats.completed;
+        document.getElementById('statEnroute').innerText = json.stats.enroute;
+    }
+}
+
+async function loadHomeStats() {
+    const res = await fetch('api_donations.php?action=get_home_stats');
+    const json = await res.json();
+    if (json.success) {
+        document.getElementById('homeMeals').innerText = json.stats.meals + '+';
+        document.getElementById('homeRests').innerText = json.stats.rests;
+        document.getElementById('homeOrgs').innerText = json.stats.orgs;
+        document.getElementById('homeVols').innerText = json.stats.vols;
+    }
+}
+
+function renderFoods(data) {
+  const grid = document.getElementById('foodGrid');
+  if (!data.length) { grid.innerHTML = '<div class="empty-state"><div class="icon">🍽️</div><p>No food listings match your search.</p></div>'; return; }
+  grid.innerHTML = data.map(f => {
+    const statusBadge = f.status === 'available'
+      ? '<span class="badge badge-green">● Available</span>'
+      : f.status === 'requested' ? '<span class="badge badge-amber">⏳ Requested</span>'
+      : '<span class="badge badge-navy">🚴 En Route</span>';
+    const typeBadge = f.food_type === 'Vegetarian' || f.food_type === 'Vegan' || f.food_type === 'Jain'
+      ? '<span class="badge" style="background:#D8F3DC;color:#1A5C38;font-size:11px">🟢 Veg</span>'
+      : '<span class="badge" style="background:var(--coral-pale);color:#8B3820;font-size:11px">🔴 Non-Veg</span>';
+    return `<div class="food-card">
+      <div class="food-img"><div class="food-tag">${statusBadge}</div><span>🍛</span></div>
+      <div class="food-body">
+        <h4>${f.food_name}</h4>
+        <div class="food-meta">
+          <span>${typeBadge}</span>
+          <span style="margin-top:4px;display:block;font-size:12px">📍 ${f.pickup_city} &nbsp;|&nbsp; ⏰ Safe till ${new Date(f.expiry_time).toLocaleTimeString()}</span>
+          <span style="font-size:12px">🍽️ ${f.quantity} servings</span>
+        </div>
+        <div class="food-footer">
+          <div class="restaurant">🏪 ${f.restaurant_name}</div>
+          ${f.status === 'available'
+            ? `<button class="btn-sm btn-green" onclick="requestFood(${f.donation_id},'${f.food_name}','${f.restaurant_name}',${f.quantity})">Request</button>`
+            : `<button class="btn-sm btn-outline-sm" onclick="showPage('tracking')">Track</button>`}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterFoods() {
+  const q = document.getElementById('foodSearch').value.toLowerCase();
+  const type = document.getElementById('typeFilter').value;
+  const city = document.getElementById('cityFilter').value;
+  const filtered = allDonations.filter(f =>
+    (!q || f.food_name.toLowerCase().includes(q) || f.restaurant_name.toLowerCase().includes(q)) &&
+    (!type || f.food_type === type) &&
+    (!city || f.pickup_city === city)
+  );
+  renderFoods(filtered);
+}
+
+function requestFood(id, name, rest, qty) {
+  document.getElementById('reqDonationId').value = id;
+  document.getElementById('requestFoodTitle').textContent = `Request: ${name}`;
+  document.getElementById('requestFoodDetails').textContent = `${qty} servings from ${rest}`;
+  showPage('request');
+}
+
+// ─── TRACKING ───
+async function showTracking() {
+  const trackId = document.getElementById('trackInput').value;
+  const res = await fetch(`api_tracking.php?action=track_delivery&tracking_id=${trackId}`);
+  const json = await res.json();
+  const resultDiv = document.getElementById('trackingResult');
+  
+  if (json.success) {
+      const d = json.data;
+      resultDiv.innerHTML = `
+      <div class="tracking-card">
+        <div class="tracking-top">
+          <h3>🍛 ${d.food_name} — ${d.quantity} Servings</h3>
+          <p>Donation ID: FB-2024-${d.donation_id} &nbsp;|&nbsp; ${d.restaurant_name} → ${d.receiver_name}</p>
+        </div>
+        <div class="tracking-body">
+          <div style="display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap">
+            <div><div style="font-size:12px;color:var(--text-muted)">Volunteer</div><div style="font-weight:600;font-size:14px">${d.vol_first ? d.vol_first + ' ' + d.vol_last : 'Pending'}</div></div>
+            <div><div style="font-size:12px;color:var(--text-muted)">Vehicle</div><div style="font-weight:600;font-size:14px">${d.vehicle_type || 'Pending'}</div></div>
+            <div><span class="badge badge-amber">🚴 ${d.status.toUpperCase()}</span></div>
+          </div>
+        </div>
+      </div>`;
+      resultDiv.style.display = 'block';
+  } else {
+      alert(json.message);
+  }
+}
+
+// ─── ADMIN ───
+async function renderAdminOverview() {
+  const res = await fetch('api_admin.php?action=get_pending_users');
+  const json = await res.json();
+  const pending = json.success ? json.data : [];
+  
+  document.getElementById('adminContent').innerHTML = `
+    <h2 style="font-family:var(--font-display);font-size:24px;color:var(--navy);margin-bottom:20px">📊 Admin Overview</h2>
+    <div style="display:grid;grid-template-columns:1fr;gap:20px;margin-top:4px">
+      <div class="table-wrap">
+        <div class="table-head"><h3>⏳ Pending Approvals</h3></div>
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>Type</th><th>Action</th></tr></thead>
+          <tbody>
+            ${pending.map(p => `<tr><td>${p.name}</td><td>${p.email}</td><td><span class="badge badge-amber">${p.type}</span></td><td><button class="btn-sm btn-green" onclick="approveEntity(${p.id}, '${p.type}', '${p.name}')">Approve</button></td></tr>`).join('') || '<tr><td colspan="4">No pending approvals</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+async function approveEntity(id, type, name) {
+    const res = await fetchPost('api_admin.php', { action: 'approve_user', id, type });
+    if (res.success) {
+        document.getElementById('approveMsg').textContent = `${name} has been approved.`;
+        showModal('approveModal');
+        renderAdminOverview();
+    } else {
+        alert(res.message);
+    }
+}
+
+function showAdminTab(tab) {
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  if (tab === 'overview') renderAdminOverview();
+  else if (tab === 'donations') renderAdminDonations();
+}
+
+async function renderAdminDonations() {
+  const res = await fetch('api_admin.php?action=get_all_donations');
+  const json = await res.json();
+  const donations = json.success ? json.data : [];
+  document.getElementById('adminContent').innerHTML = `
+    <h2 style="font-family:var(--font-display);font-size:24px;color:var(--navy);margin-bottom:20px">🍛 Donations</h2>
+      <div class="table-wrap">
+        <div class="table-head"><h3>All Food Donations</h3></div>
+        <table><thead><tr><th>ID</th><th>Food</th><th>Qty</th><th>Restaurant</th><th>Status</th></tr></thead>
+        <tbody>${donations.map(d => `
+          <tr><td>${d.donation_id}</td><td>${d.food_name}</td><td>${d.quantity}</td><td>${d.restaurant_name}</td>
+          <td><span class="badge badge-gray">${d.status}</span></td></tr>
+        `).join('')}</tbody></table>
+      </div>`;
+}
+
+// ─── MODALS ───
+function showModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+loadDonations();
+loadHomeStats();
+</script>
+</body>
+</html>
