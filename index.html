@@ -1,0 +1,1803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FoodBridge — Food Allocation System</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --green:#2D6A4F;--green-light:#52B788;--green-pale:#D8F3DC;
+  --amber:#E9A227;--amber-pale:#FFF3CD;
+  --coral:#E76F51;--coral-pale:#FFE8DF;
+  --navy:#1B2D45;--navy-light:#2E4A6B;
+  --cream:#FAFAF7;--white:#FFFFFF;
+  --gray:#F4F4F0;--gray-mid:#C5C5BC;--gray-dark:#6B6B62;
+  --text:#1A1A16;--text-muted:#6B6B62;
+  --font-display:'Playfair Display',serif;
+  --font-body:'DM Sans',sans-serif;
+  --radius:12px;--radius-lg:20px;
+  --shadow:0 2px 16px rgba(0,0,0,0.08);
+  --shadow-lg:0 8px 40px rgba(0,0,0,0.12);
+}
+body{font-family:var(--font-body);background:var(--cream);color:var(--text);line-height:1.6;font-size:15px}
+h1,h2,h3,h4{font-family:var(--font-display);line-height:1.25}
+
+/* NAV */
+nav{background:var(--white);border-bottom:1px solid #E8E8E2;position:sticky;top:0;z-index:100;box-shadow:0 1px 12px rgba(0,0,0,0.06)}
+.nav-inner{max-width:1100px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{font-family:var(--font-display);font-size:22px;color:var(--green);font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px}
+.logo-leaf{width:28px;height:28px;background:var(--green);border-radius:50% 50% 0 50%;display:inline-flex;align-items:center;justify-content:center}
+.logo-leaf svg{fill:white;width:14px;height:14px}
+.nav-links{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.nav-links a{font-size:13px;font-weight:500;color:var(--text-muted);text-decoration:none;padding:6px 10px;border-radius:8px;cursor:pointer;transition:all 0.15s}
+.nav-links a:hover,.nav-links a.active{color:var(--green);background:var(--green-pale)}
+.nav-btn{background:var(--green);color:white;font-size:13px;font-weight:600;padding:8px 16px;border-radius:8px;cursor:pointer;border:none;font-family:var(--font-body);transition:background 0.15s}
+.nav-btn:hover{background:#235C44}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px}
+.hamburger span{width:22px;height:2px;background:var(--text);border-radius:2px;transition:all 0.2s}
+
+/* PAGES */
+.page{display:none;min-height:calc(100vh - 64px)}
+.page.active{display:block}
+
+/* HOME */
+.hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 60%,#2D5016 100%);color:white;padding:90px 24px 80px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='1.5' fill='rgba(255,255,255,0.04)'/%3E%3C/svg%3E")}
+.hero-inner{max-width:720px;margin:0 auto;position:relative}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:100px;padding:6px 16px;font-size:13px;font-weight:500;margin-bottom:28px;color:rgba(255,255,255,0.9)}
+.hero h1{font-size:clamp(36px,5vw,58px);font-weight:700;margin-bottom:20px;color:white}
+.hero h1 span{color:var(--green-light)}
+.hero p{font-size:17px;color:rgba(255,255,255,0.75);max-width:560px;margin:0 auto 36px;font-weight:300}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-primary{background:var(--green-light);color:var(--navy);font-weight:700;padding:14px 28px;border-radius:10px;cursor:pointer;border:none;font-family:var(--font-body);font-size:15px;transition:all 0.15s}
+.btn-primary:hover{background:#45A37A;transform:translateY(-1px)}
+.btn-outline{background:transparent;color:white;border:2px solid rgba(255,255,255,0.4);font-weight:600;padding:13px 28px;border-radius:10px;cursor:pointer;font-family:var(--font-body);font-size:15px;transition:all 0.15s}
+.btn-outline:hover{border-color:white;background:rgba(255,255,255,0.08)}
+
+.stats-bar{background:var(--white);padding:32px 24px;border-bottom:1px solid #EEEEE8}
+.stats-inner{max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:24px;text-align:center}
+.stat-item .num{font-family:var(--font-display);font-size:36px;font-weight:700;color:var(--green)}
+.stat-item .label{font-size:13px;color:var(--text-muted);margin-top:2px}
+
+.section{padding:70px 24px;max-width:1100px;margin:0 auto}
+.section-title{text-align:center;margin-bottom:48px}
+.section-title h2{font-size:clamp(28px,3.5vw,40px);color:var(--navy);margin-bottom:10px}
+.section-title p{color:var(--text-muted);font-size:16px;max-width:500px;margin:0 auto}
+
+.how-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px}
+.how-card{background:var(--white);border:1px solid #E8E8E2;border-radius:var(--radius-lg);padding:32px 24px;text-align:center;transition:box-shadow 0.2s}
+.how-card:hover{box-shadow:var(--shadow-lg)}
+.how-icon{width:60px;height:60px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:26px}
+.how-card h3{font-size:18px;color:var(--navy);margin-bottom:10px}
+.how-card p{font-size:14px;color:var(--text-muted)}
+.icon-green{background:var(--green-pale)}
+.icon-amber{background:var(--amber-pale)}
+.icon-coral{background:var(--coral-pale)}
+.icon-navy{background:#E8EEF5}
+
+.role-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.role-card{border-radius:var(--radius-lg);padding:32px;color:white;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s}
+.role-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.role-card.restaurant{background:linear-gradient(135deg,var(--green),#1B5C38)}
+.role-card.receiver{background:linear-gradient(135deg,var(--navy-light),var(--navy))}
+.role-card.volunteer{background:linear-gradient(135deg,var(--amber),#C07A0A)}
+.role-card h3{font-size:22px;margin-bottom:10px}
+.role-card p{font-size:14px;opacity:0.85;margin-bottom:20px}
+.role-card .go-btn{display:inline-block;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer}
+
+/* FORMS */
+.form-page{max-width:560px;margin:0 auto;padding:48px 24px}
+.form-header{text-align:center;margin-bottom:36px}
+.form-header .icon-wrap{width:64px;height:64px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px}
+.form-header h2{font-size:28px;color:var(--navy)}
+.form-header p{color:var(--text-muted);font-size:14px;margin-top:6px}
+.card-form{background:var(--white);border:1px solid #E8E8E2;border-radius:var(--radius-lg);padding:32px;box-shadow:var(--shadow)}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:6px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:11px 14px;border:1.5px solid #DDDDD6;border-radius:10px;font-family:var(--font-body);font-size:14px;color:var(--text);background:var(--cream);outline:none;transition:border-color 0.15s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--green-light);background:white}
+.form-group textarea{resize:vertical;min-height:90px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.btn-submit{width:100%;background:var(--green);color:white;border:none;padding:14px;border-radius:10px;font-family:var(--font-body);font-size:15px;font-weight:600;cursor:pointer;margin-top:8px;transition:background 0.15s}
+.btn-submit:hover{background:#235C44}
+.btn-submit.amber{background:var(--amber)}
+.btn-submit.amber:hover{background:#C07A0A}
+.btn-submit.navy{background:var(--navy)}
+.btn-submit.navy:hover{background:#141F30}
+.form-switch{text-align:center;margin-top:16px;font-size:13px;color:var(--text-muted)}
+.form-switch a{color:var(--green);font-weight:600;cursor:pointer}
+.tabs{display:flex;gap:4px;background:var(--gray);border-radius:10px;padding:4px;margin-bottom:28px}
+.tab{flex:1;text-align:center;padding:9px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.15s;color:var(--text-muted)}
+.tab.active{background:var(--white);color:var(--green);box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+
+/* DASHBOARD */
+.dashboard-wrap{max-width:1100px;margin:0 auto;padding:36px 24px}
+.dashboard-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:gap}
+.dashboard-header h2{font-size:26px;color:var(--navy)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:100px;font-size:12px;font-weight:600}
+.badge-green{background:var(--green-pale);color:#1A5C38}
+.badge-amber{background:var(--amber-pale);color:#7A520A}
+.badge-coral{background:var(--coral-pale);color:#8B3820}
+.badge-gray{background:var(--gray);color:var(--gray-dark)}
+.badge-navy{background:#E8EEF5;color:var(--navy)}
+
+.metric-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:28px}
+.metric-card{background:var(--white);border:1px solid #E8E8E2;border-radius:var(--radius);padding:20px}
+.metric-card .m-num{font-family:var(--font-display);font-size:32px;font-weight:700;color:var(--green)}
+.metric-card .m-label{font-size:12px;color:var(--text-muted);margin-top:2px}
+.metric-card .m-icon{float:right;font-size:24px;opacity:0.3}
+
+.food-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.food-card{background:var(--white);border:1px solid #E8E8E2;border-radius:var(--radius-lg);overflow:hidden;transition:box-shadow 0.2s}
+.food-card:hover{box-shadow:var(--shadow-lg)}
+.food-img{height:140px;background:linear-gradient(135deg,var(--green-pale),#B7E4C7);display:flex;align-items:center;justify-content:center;font-size:48px;position:relative}
+.food-tag{position:absolute;top:10px;left:10px}
+.food-body{padding:16px}
+.food-body h4{font-size:16px;color:var(--navy);margin-bottom:4px}
+.food-meta{font-size:12px;color:var(--text-muted);margin-bottom:10px}
+.food-meta span{margin-right:8px}
+.food-footer{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid #EEEEE8}
+.food-footer .restaurant{font-size:12px;color:var(--text-muted)}
+.btn-sm{padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:var(--font-body);transition:all 0.15s}
+.btn-green{background:var(--green);color:white}
+.btn-green:hover{background:#235C44}
+.btn-outline-sm{background:transparent;color:var(--green);border:1.5px solid var(--green);padding:6px 13px}
+.btn-outline-sm:hover{background:var(--green-pale)}
+
+/* TABLE */
+.table-wrap{background:var(--white);border:1px solid #E8E8E2;border-radius:var(--radius-lg);overflow:hidden;margin-bottom:24px}
+.table-head{padding:16px 20px;border-bottom:1px solid #EEEEE8;display:flex;align-items:center;justify-content:space-between}
+.table-head h3{font-size:16px;color:var(--navy)}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:12px 16px;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #EEEEE8;background:var(--gray)}
+td{padding:12px 16px;font-size:13px;color:var(--text);border-bottom:1px solid #EEEEE8}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FAFAF2}
+
+/* TRACKING */
+.tracking-wrap{max-width:700px;margin:0 auto;padding:48px 24px}
+.tracking-card{background:var(--white);border:1px solid #E8E8E2;border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow)}
+.tracking-top{background:var(--navy);color:white;padding:24px}
+.tracking-top h3{font-size:20px;margin-bottom:4px}
+.tracking-top p{font-size:13px;opacity:0.7}
+.tracking-body{padding:24px}
+.timeline{position:relative;padding-left:32px}
+.timeline::before{content:'';position:absolute;left:11px;top:6px;bottom:6px;width:2px;background:#E8E8E2}
+.tl-step{position:relative;margin-bottom:24px}
+.tl-step:last-child{margin-bottom:0}
+.tl-dot{position:absolute;left:-32px;top:4px;width:22px;height:22px;border-radius:50%;border:3px solid #E8E8E2;background:var(--white);display:flex;align-items:center;justify-content:center}
+.tl-dot.done{background:var(--green);border-color:var(--green)}
+.tl-dot.done::after{content:'✓';font-size:10px;color:white;font-weight:700}
+.tl-dot.active{background:var(--amber);border-color:var(--amber);animation:pulse 1.5s infinite}
+.tl-dot.active::after{content:'';width:6px;height:6px;background:white;border-radius:50%}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(233,162,39,0.4)}50%{box-shadow:0 0 0 8px rgba(233,162,39,0)}}
+.tl-content h4{font-size:14px;font-weight:600;color:var(--navy)}
+.tl-content p{font-size:12px;color:var(--text-muted);margin-top:2px}
+
+/* ADMIN */
+.admin-layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 64px)}
+.admin-sidebar{background:var(--navy);color:white;padding:24px 0}
+.sidebar-logo{padding:0 20px 24px;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:16px}
+.sidebar-logo span{font-family:var(--font-display);font-size:18px}
+.sidebar-link{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:14px;font-weight:500;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.15s}
+.sidebar-link:hover,.sidebar-link.active{background:rgba(255,255,255,0.08);color:white}
+.sidebar-link .icon{font-size:16px;width:20px;text-align:center}
+.admin-main{background:var(--gray);padding:32px}
+
+/* ABOUT */
+.about-hero{background:var(--white);padding:70px 24px;text-align:center;border-bottom:1px solid #E8E8E2}
+.about-hero h1{font-size:clamp(32px,4vw,48px);color:var(--navy);margin-bottom:14px}
+.about-hero p{color:var(--text-muted);max-width:600px;margin:0 auto;font-size:16px}
+.about-grid{max-width:900px;margin:0 auto;padding:60px 24px}
+.about-section{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-bottom:60px}
+.about-section.reverse{direction:rtl}
+.about-section.reverse > *{direction:ltr}
+.about-visual{height:220px;border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;font-size:72px}
+.av-green{background:var(--green-pale)}
+.av-navy{background:#E8EEF5}
+.av-amber{background:var(--amber-pale)}
+.about-text h3{font-size:24px;color:var(--navy);margin-bottom:12px}
+.about-text p{color:var(--text-muted);font-size:15px}
+
+/* CONTACT */
+.contact-wrap{max-width:900px;margin:0 auto;padding:60px 24px}
+.contact-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:32px}
+.contact-info{background:var(--navy);border-radius:var(--radius-lg);padding:36px;color:white}
+.contact-info h3{font-size:22px;margin-bottom:8px}
+.contact-info p{font-size:14px;opacity:0.75;margin-bottom:28px}
+.contact-item{display:flex;align-items:flex-start;gap:12px;margin-bottom:20px}
+.contact-item .ci-icon{font-size:18px;margin-top:2px}
+.contact-item h4{font-size:13px;font-weight:600;margin-bottom:2px}
+.contact-item p{font-size:13px;opacity:0.7}
+.contact-form{background:var(--white);border:1px solid #E8E8E2;border-radius:var(--radius-lg);padding:36px;box-shadow:var(--shadow)}
+
+/* ALERT */
+.alert{padding:14px 18px;border-radius:10px;font-size:14px;margin-bottom:16px;display:flex;align-items:flex-start;gap:10px}
+.alert-success{background:#D8F3DC;color:#1A5C38;border:1px solid #B7E4C7}
+.alert-info{background:#E8EEF5;color:var(--navy);border:1px solid #C5D4E8}
+.alert-warn{background:var(--amber-pale);color:#7A520A;border:1px solid #F5D99A}
+
+/* FOOTER */
+footer{background:var(--navy);color:rgba(255,255,255,0.7);text-align:center;padding:32px 24px;font-size:13px;margin-top:60px}
+footer span{color:var(--green-light)}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;padding:24px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--white);border-radius:var(--radius-lg);padding:32px;max-width:420px;width:100%;box-shadow:var(--shadow-lg)}
+.modal h3{font-size:20px;color:var(--navy);margin-bottom:8px}
+.modal p{font-size:14px;color:var(--text-muted);margin-bottom:24px}
+.modal-btns{display:flex;gap:10px;justify-content:flex-end}
+.btn-cancel{padding:9px 18px;border:1.5px solid #DDDDD6;border-radius:8px;font-family:var(--font-body);font-size:14px;cursor:pointer;background:white;color:var(--text)}
+.btn-confirm{padding:9px 18px;border:none;border-radius:8px;background:var(--green);color:white;font-family:var(--font-body);font-size:14px;font-weight:600;cursor:pointer}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .hamburger{display:flex}
+  .nav-links{display:none;position:absolute;top:64px;left:0;right:0;background:var(--white);border-bottom:1px solid #E8E8E2;flex-direction:column;padding:12px;gap:4px;box-shadow:var(--shadow)}
+  .nav-links.open{display:flex}
+  .admin-layout{grid-template-columns:1fr}
+  .admin-sidebar{display:none}
+  .about-section,.contact-grid{grid-template-columns:1fr}
+  .about-section.reverse{direction:ltr}
+  .form-row{grid-template-columns:1fr}
+}
+.search-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.search-bar input{flex:1;min-width:160px;padding:10px 14px;border:1.5px solid #DDDDD6;border-radius:10px;font-family:var(--font-body);font-size:14px;outline:none;transition:border-color 0.15s}
+.search-bar input:focus{border-color:var(--green-light)}
+.search-bar select{padding:10px 14px;border:1.5px solid #DDDDD6;border-radius:10px;font-family:var(--font-body);font-size:14px;outline:none;background:white}
+.filter-btn{padding:10px 16px;background:var(--green);color:white;border:none;border-radius:10px;font-family:var(--font-body);font-size:14px;font-weight:600;cursor:pointer}
+.empty-state{text-align:center;padding:60px 24px;color:var(--text-muted)}
+.empty-state .icon{font-size:48px;margin-bottom:12px}
+.empty-state p{font-size:15px}
+.section-full{padding:40px 24px;max-width:1100px;margin:0 auto}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="logo" onclick="showPage('home')">
+      <div class="logo-leaf"><svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 19.15L5.71 21l1-1.15C7.15 19.27 9.5 18 12 18c5 0 9-4 9-9-1 0-3 1-4 2z"/></svg></div>
+      FoodBridge
+    </div>
+    <div class="nav-links" id="navLinks">
+      <a onclick="showPage('home')" class="active" id="nav-home">Home</a>
+      <a onclick="showPage('about')" id="nav-about">About</a>
+      <a onclick="showPage('dashboard')" id="nav-dashboard">Food Board</a>
+      <a onclick="showPage('tracking')" id="nav-tracking">Tracking</a>
+      <a onclick="showPage('contact')" id="nav-contact">Contact</a>
+      <a onclick="showPage('admin-login')" id="nav-admin" style="color:var(--coral)">Admin</a>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center" id="navAuthArea">
+      <!-- Managed dynamically by JS based on session -->
+      <button class="nav-btn" onclick="showPage('restaurant-auth')">Restaurant</button>
+      <button class="nav-btn" style="background:var(--navy)" onclick="showPage('receiver-auth')">Receiver</button>
+      <div class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ==================== HOME ==================== -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="hero-badge">🌱 Zero Hunger, Zero Waste</div>
+      <h1>Connecting <span>Surplus Food</span><br>to Those Who Need It</h1>
+      <p>FoodBridge is a real-time platform that links restaurants with NGOs, orphanages, and ashrams to redirect leftover food safely and efficiently — before it goes to waste.</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="showPage('restaurant-auth')">🍽️ I'm a Restaurant</button>
+        <button class="btn-outline" onclick="showPage('receiver-auth')">🏠 I'm a Receiver Org</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stats-inner">
+      <div class="stat-item"><div class="num" id="homeMeals">0</div><div class="label">Meals Donated</div></div>
+      <div class="stat-item"><div class="num" id="homeRests">0</div><div class="label">Partner Restaurants</div></div>
+      <div class="stat-item"><div class="num" id="homeOrgs">0</div><div class="label">Receiver Orgs</div></div>
+      <div class="stat-item"><div class="num" id="homeVols">0</div><div class="label">Active Volunteers</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><h2>How It Works</h2><p>A simple 4-step process to get food from kitchen to community</p></div>
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="how-icon icon-green">🍛</div>
+        <h3>Restaurant Lists Food</h3>
+        <p>Restaurants upload leftover details — quantity, food type, expiry time, and pickup location.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-icon icon-navy">🔍</div>
+        <h3>NGO Discovers</h3>
+        <p>Receiver organizations browse the food board and send a pickup request for available items.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-icon icon-amber">🚴</div>
+        <h3>Volunteer Delivers</h3>
+        <p>A verified volunteer picks up the food and delivers it, updating status at every step.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-icon icon-coral">✅</div>
+        <h3>Impact Recorded</h3>
+        <p>Admin logs the completed donation. Both parties receive confirmation and the data feeds our impact tracker.</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:var(--white);padding:70px 24px;border-top:1px solid #E8E8E2;border-bottom:1px solid #E8E8E2">
+    <div class="section-title"><h2>Join the Network</h2><p>Pick your role and start making a difference today</p></div>
+    <div style="max-width:900px;margin:0 auto" class="role-cards">
+      <div class="role-card restaurant" onclick="showPage('restaurant-auth')">
+        <h3>🍽️ Restaurant</h3>
+        <p>List your surplus food in minutes and let verified organizations collect it safely.</p>
+        <div class="go-btn">Register / Login →</div>
+      </div>
+      <div class="role-card receiver" onclick="showPage('receiver-auth')">
+        <h3>🏠 Receiver Org</h3>
+        <p>NGOs, orphanages, and ashrams can browse available food and raise pickup requests.</p>
+        <div class="go-btn">Register / Login →</div>
+      </div>
+      <div class="role-card volunteer" onclick="showPage('volunteer-reg')">
+        <h3>🚴 Volunteer</h3>
+        <p>Help us deliver food and create real community impact with just a few hours a week.</p>
+        <div class="go-btn">Sign Up →</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><h2>Database Schema</h2><p>Tables stored in the FoodBridge DBMS (Simulated via LocalStorage)</p></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px">
+      <div class="table-wrap" style="margin:0">
+        <div class="table-head" style="background:var(--green-pale)"><h3 style="color:var(--green);font-size:14px">📋 Restaurants</h3></div>
+        <div style="padding:14px 16px;font-size:12px;color:var(--text-muted)">
+          <div style="margin-bottom:6px">🔑 restaurant_id (PK)</div>
+          <div>name, owner_name, email, phone</div>
+          <div>address, city, fssai_no</div>
+          <div>password, status, created_at</div>
+        </div>
+      </div>
+      <div class="table-wrap" style="margin:0">
+        <div class="table-head" style="background:#E8EEF5"><h3 style="color:var(--navy);font-size:14px">🏠 Receiver Orgs</h3></div>
+        <div style="padding:14px 16px;font-size:12px;color:var(--text-muted)">
+          <div style="margin-bottom:6px">🔑 receiver_id (PK)</div>
+          <div>org_name, org_type, rep_name</div>
+          <div>email, phone, address, city</div>
+          <div>reg_no, password, status</div>
+        </div>
+      </div>
+      <div class="table-wrap" style="margin:0">
+        <div class="table-head" style="background:var(--amber-pale)"><h3 style="color:#7A520A;font-size:14px">🚴 Volunteers</h3></div>
+        <div style="padding:14px 16px;font-size:12px;color:var(--text-muted)">
+          <div style="margin-bottom:6px">🔑 volunteer_id (PK)</div>
+          <div>name, email, phone, city</div>
+          <div>vehicle_type, availability</div>
+          <div>status, registered_at</div>
+        </div>
+      </div>
+      <div class="table-wrap" style="margin:0">
+        <div class="table-head" style="background:var(--coral-pale)"><h3 style="color:#8B3820;font-size:14px">🍛 Food Donations</h3></div>
+        <div style="padding:14px 16px;font-size:12px;color:var(--text-muted)">
+          <div style="margin-bottom:6px">🔑 donation_id (PK)</div>
+          <div>🔗 restaurant_id (FK)</div>
+          <div>food_name, quantity, food_type</div>
+          <div>prep_time, expiry_time, status</div>
+        </div>
+      </div>
+      <div class="table-wrap" style="margin:0">
+        <div class="table-head" style="background:var(--gray)"><h3 style="font-size:14px">📦 Deliveries</h3></div>
+        <div style="padding:14px 16px;font-size:12px;color:var(--text-muted)">
+          <div style="margin-bottom:6px">🔑 delivery_id (PK)</div>
+          <div>🔗 donation_id, volunteer_id</div>
+          <div>🔗 receiver_id (all FK)</div>
+          <div>status, pickup_time, delivered_at</div>
+        </div>
+      </div>
+      <div class="table-wrap" style="margin:0">
+        <div class="table-head" style="background:var(--gray)"><h3 style="font-size:14px">🔐 Admin</h3></div>
+        <div style="padding:14px 16px;font-size:12px;color:var(--text-muted)">
+          <div style="margin-bottom:6px">🔑 admin_id (PK)</div>
+          <div>username, email</div>
+          <div>password, role</div>
+          <div>last_login, created_at</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>© 2024 FoodBridge — DBMS Mini Project &nbsp;|&nbsp; Developed with ❤️ for <span>Zero Hunger</span></footer>
+</div>
+
+<!-- ==================== ABOUT ==================== -->
+<div class="page" id="page-about">
+  <div class="about-hero">
+    <h1>About FoodBridge</h1>
+    <p>A DBMS mini-project designed to reduce food waste and feed communities by creating an intelligent distribution network.</p>
+  </div>
+  <div class="about-grid">
+    <div class="about-section">
+      <div class="about-visual av-green">🌾</div>
+      <div class="about-text">
+        <h3>The Problem We Solve</h3>
+        <p>Every day, tonnes of perfectly edible food is discarded by restaurants while thousands in the same city go hungry. FoodBridge creates a digital bridge between these two worlds using real-time data and community volunteers.</p>
+      </div>
+    </div>
+    <div class="about-section reverse">
+      <div class="about-visual av-navy">🎯</div>
+      <div class="about-text">
+        <h3>Project Objective</h3>
+        <p>This project demonstrates a relational database system with multiple user roles, CRUD operations, relational integrity (foreign keys), and real-time status tracking — built as a Second Year DBMS Mini Project.</p>
+      </div>
+    </div>
+    <div class="about-section">
+      <div class="about-visual av-amber">🤝</div>
+      <div class="about-text">
+        <h3>Community Impact</h3>
+        <p>By connecting restaurants, NGOs, and volunteers on a single platform, FoodBridge streamlines the donation workflow — reducing food waste while ensuring safe, timely delivery to those in need.</p>
+      </div>
+    </div>
+  </div>
+  <div style="background:var(--navy);color:white;padding:48px 24px;text-align:center">
+    <h2 style="font-family:var(--font-display);font-size:28px;margin-bottom:10px">Technologies Used</h2>
+    <p style="opacity:0.7;margin-bottom:28px">Built with standard web and browser database technologies</p>
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px;max-width:600px;margin:0 auto">
+      <span class="badge badge-green" style="font-size:14px;padding:8px 16px">LocalStorage / DB</span>
+      <span class="badge badge-navy" style="font-size:14px;padding:8px 16px;background:rgba(255,255,255,0.15);color:white">HTML5 / CSS3</span>
+      <span class="badge badge-amber" style="font-size:14px;padding:8px 16px">JavaScript ES6</span>
+      <span class="badge" style="font-size:14px;padding:8px 16px;background:var(--coral-pale);color:#8B3820">Client-Side Session</span>
+      <span class="badge badge-gray" style="font-size:14px;padding:8px 16px">Relational Schema</span>
+      <span class="badge badge-green" style="font-size:14px;padding:8px 16px">CRUD Operations</span>
+    </div>
+  </div>
+  <footer>© 2024 FoodBridge — DBMS Mini Project &nbsp;|&nbsp; Developed with ❤️ for <span>Zero Hunger</span></footer>
+</div>
+
+<!-- ==================== RESTAURANT AUTH ==================== -->
+<div class="page" id="page-restaurant-auth">
+  <div class="form-page">
+    <div class="form-header">
+      <div class="icon-wrap icon-green" style="background:var(--green-pale)">🍽️</div>
+      <h2>Restaurant Portal</h2>
+      <p>Register your restaurant or log in to manage food donations</p>
+    </div>
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('r','login')">Login</div>
+      <div class="tab" onclick="switchTab('r','register')">Register</div>
+    </div>
+
+    <!-- Login form -->
+    <div id="r-login" class="card-form">
+      <form onsubmit="event.preventDefault(); handleLogin('restaurant', this);">
+        <div class="form-group"><label>Email Address</label><input type="email" name="email" required placeholder="restaurant@example.com"></div>
+        <div class="form-group"><label>Password</label><input type="password" name="password" required placeholder="••••••••"></div>
+        <button type="submit" class="btn-submit">Login to Dashboard</button>
+        <div class="form-switch">Don't have an account? <a onclick="switchTab('r','register')">Register here</a></div>
+      </form>
+    </div>
+
+    <!-- Register form -->
+    <div id="r-register" class="card-form" style="display:none">
+      <form onsubmit="event.preventDefault(); handleRegister('restaurant', this);">
+        <div class="form-group"><label>Restaurant Name</label><input type="text" name="name" required placeholder="e.g. Spice Garden Restaurant"></div>
+        <div class="form-row">
+          <div class="form-group"><label>Owner Name</label><input type="text" name="owner_name" required placeholder="Full name"></div>
+          <div class="form-group"><label>FSSAI License No.</label><input type="text" name="fssai_no" required placeholder="FSSAI number"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Email</label><input type="email" name="email" required placeholder="email@restaurant.com"></div>
+          <div class="form-group"><label>Phone</label><input type="tel" name="phone" required placeholder="+91 XXXXX XXXXX"></div>
+        </div>
+        <div class="form-group"><label>Full Address</label><textarea name="address" required placeholder="Street address, landmark, city..."></textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label>City</label><input type="text" name="city" required placeholder="Your city"></div>
+          <div class="form-group"><label>Pincode</label><input type="text" name="pincode" placeholder="560001"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Password</label><input type="password" name="password" required placeholder="Create password"></div>
+          <div class="form-group"><label>Confirm Password</label><input type="password" name="confirm_password" required placeholder="Repeat password"></div>
+        </div>
+        <button type="submit" class="btn-submit">Register Restaurant</button>
+        <div class="form-switch">Already registered? <a onclick="switchTab('r','login')">Login here</a></div>
+      </form>
+    </div>
+  </div>
+  <footer>© 2024 FoodBridge &nbsp;|&nbsp; <span>Zero Hunger</span></footer>
+</div>
+
+<!-- ==================== RECEIVER AUTH ==================== -->
+<div class="page" id="page-receiver-auth">
+  <div class="form-page">
+    <div class="form-header">
+      <div class="icon-wrap" style="background:#E8EEF5">🏠</div>
+      <h2>Receiver Org Portal</h2>
+      <p>For NGOs, orphanages, and ashrams to access food donations</p>
+    </div>
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('o','login')">Login</div>
+      <div class="tab" onclick="switchTab('o','register')">Register</div>
+    </div>
+
+    <!-- Login form -->
+    <div id="o-login" class="card-form">
+      <form onsubmit="event.preventDefault(); handleLogin('receiver', this);">
+        <div class="form-group"><label>Email Address</label><input type="email" name="email" required placeholder="ngo@example.org"></div>
+        <div class="form-group"><label>Password</label><input type="password" name="password" required placeholder="••••••••"></div>
+        <button type="submit" class="btn-submit navy">Login to Dashboard</button>
+        <div class="form-switch">Not registered? <a onclick="switchTab('o','register')">Register your organization</a></div>
+      </form>
+    </div>
+
+    <!-- Register form -->
+    <div id="o-register" class="card-form" style="display:none">
+      <form onsubmit="event.preventDefault(); handleRegister('receiver', this);">
+        <div class="form-group"><label>Organization Name</label><input type="text" name="org_name" required placeholder="e.g. Helping Hands NGO"></div>
+        <div class="form-row">
+          <div class="form-group"><label>Organization Type</label>
+            <select name="org_type"><option>NGO</option><option>Orphanage</option><option>Ashram</option><option>Old Age Home</option><option>School / Trust</option></select>
+          </div>
+          <div class="form-group"><label>Registration No.</label><input type="text" name="reg_no" required placeholder="Govt reg number"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Representative Name</label><input type="text" name="rep_name" required placeholder="Full name"></div>
+          <div class="form-group"><label>Designation</label><input type="text" name="designation" placeholder="e.g. Director, Coordinator"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Email</label><input type="email" name="email" required placeholder="org@ngo.org"></div>
+          <div class="form-group"><label>Phone</label><input type="tel" name="phone" required placeholder="+91 XXXXX XXXXX"></div>
+        </div>
+        <div class="form-group"><label>Address</label><textarea name="address" required placeholder="Full address of your organization..."></textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label>City</label><input type="text" name="city" required placeholder="City"></div>
+          <div class="form-group"><label>Beneficiaries Count</label><input type="number" name="beneficiaries" placeholder="e.g. 120"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Password</label><input type="password" name="password" required placeholder="Create password"></div>
+          <div class="form-group"><label>Confirm Password</label><input type="password" name="confirm_password" required placeholder="Repeat password"></div>
+        </div>
+        <button type="submit" class="btn-submit navy">Register Organization</button>
+        <div class="form-switch">Already have an account? <a onclick="switchTab('o','login')">Login here</a></div>
+      </form>
+    </div>
+  </div>
+  <footer>© 2024 FoodBridge &nbsp;|&nbsp; <span>Zero Hunger</span></footer>
+</div>
+
+<!-- ==================== VOLUNTEER REG ==================== -->
+<div class="page" id="page-volunteer-reg">
+  <div class="form-page">
+    <div class="form-header">
+      <div class="icon-wrap" style="background:var(--amber-pale)">🚴</div>
+      <h2>Volunteer Registration</h2>
+      <p>Join our delivery team and help food reach those who need it</p>
+    </div>
+    <div class="card-form">
+      <form onsubmit="event.preventDefault(); handleRegister('volunteer', this);">
+        <div class="alert alert-success">✅ Volunteers are registered and can start delivering food immediately!</div>
+        <div class="form-row">
+          <div class="form-group"><label>First Name</label><input type="text" name="first_name" required placeholder="First name"></div>
+          <div class="form-group"><label>Last Name</label><input type="text" name="last_name" required placeholder="Last name"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Email</label><input type="email" name="email" required placeholder="your@email.com"></div>
+          <div class="form-group"><label>Phone</label><input type="tel" name="phone" required placeholder="+91 XXXXX XXXXX"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>City</label><input type="text" name="city" required placeholder="City"></div>
+          <div class="form-group"><label>Aadhar / ID No.</label><input type="text" name="aadhar_no" required placeholder="For verification"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Vehicle Type</label>
+            <select name="vehicle_type"><option>Bicycle</option><option>Two-Wheeler</option><option>Car</option><option>Auto Rickshaw</option><option>Walk (Nearby only)</option></select>
+          </div>
+          <div class="form-group"><label>Availability</label>
+            <select name="availability"><option>Weekdays</option><option>Weekends</option><option>Anytime</option><option>Mornings only</option><option>Evenings only</option></select>
+          </div>
+        </div>
+        <div class="form-group"><label>About Yourself</label><textarea name="about" placeholder="Brief note about why you want to volunteer..."></textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label>Password</label><input type="password" name="password" required placeholder="Create password"></div>
+          <div class="form-group"><label>Confirm Password</label><input type="password" name="confirm_password" required placeholder="Repeat password"></div>
+        </div>
+        <button type="submit" class="btn-submit amber">Register as Volunteer</button>
+      </form>
+    </div>
+  </div>
+  <footer>© 2024 FoodBridge &nbsp;|&nbsp; <span>Zero Hunger</span></footer>
+</div>
+
+<!-- ==================== FOOD DONATION FORM ==================== -->
+<div class="page" id="page-donate">
+  <div class="form-page" style="max-width:680px">
+    <div class="form-header">
+      <div class="icon-wrap icon-green" style="background:var(--green-pale)">🍛</div>
+      <h2>Submit Food Donation</h2>
+      <p>List your surplus food so nearby organizations can request it</p>
+    </div>
+    <div class="card-form">
+      <form onsubmit="event.preventDefault(); handlePostDonation(this);">
+        <div class="alert alert-warn">⏰ Only list food that is safe to consume and within expiry time</div>
+        <div class="form-row">
+          <div class="form-group"><label>Food Name / Description</label><input type="text" name="food_name" required placeholder="e.g. Biryani, Dal Rice, Chapati"></div>
+          <div class="form-group"><label>Quantity (Servings)</label><input type="number" name="quantity" required placeholder="e.g. 50"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Food Type</label>
+            <select name="food_type"><option>Vegetarian</option><option>Non-Vegetarian</option><option>Vegan</option><option>Jain</option></select>
+          </div>
+          <div class="form-group"><label>Packaging</label>
+            <select name="packaging"><option>Packed in containers</option><option>Loose / Bulk</option><option>Sealed packets</option></select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Preparation Time</label><input type="datetime-local" name="prep_time" required></div>
+          <div class="form-group"><label>Safe Until (Expiry)</label><input type="datetime-local" name="expiry_time" required></div>
+        </div>
+        <div class="form-group"><label>Pickup Address</label><textarea name="pickup_address" required placeholder="Specific address for food pickup..."></textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label>City</label><input type="text" name="city" required placeholder="City"></div>
+          <div class="form-group"><label>Pickup Contact Number</label><input type="tel" name="pickup_phone" required placeholder="+91 XXXXX XXXXX"></div>
+        </div>
+        <div class="form-group"><label>Special Instructions</label><textarea name="special_instructions" placeholder="Allergies, temperature notes, handling instructions..."></textarea></div>
+        <button type="submit" class="btn-submit">Post Food Donation</button>
+      </form>
+    </div>
+  </div>
+  <footer>© 2024 FoodBridge &nbsp;|&nbsp; <span>Zero Hunger</span></footer>
+</div>
+
+<!-- ==================== FOOD DASHBOARD ==================== -->
+<div class="page" id="page-dashboard">
+  <div class="dashboard-wrap">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+      <div><h2 style="font-family:var(--font-display);font-size:26px;color:var(--navy)">Food Availability Board</h2><p style="color:var(--text-muted);font-size:14px">Browse available donations near you</p></div>
+      <button class="btn-green btn-sm" style="padding:10px 18px" onclick="showPage('donate')">+ Post Donation</button>
+    </div>
+
+    <div class="metric-row">
+      <div class="metric-card"><span class="m-icon">🍛</span><div class="m-num" id="statActive">0</div><div class="m-label">Available Now</div></div>
+      <div class="metric-card"><span class="m-icon">⏳</span><div class="m-num" id="statRequested">0</div><div class="m-label">Requested</div></div>
+      <div class="metric-card"><span class="m-icon">✅</span><div class="m-num" id="statCompleted">0</div><div class="m-label">Completed Today</div></div>
+      <div class="metric-card"><span class="m-icon">🚴</span><div class="m-num" id="statEnroute">0</div><div class="m-label">En Route</div></div>
+    </div>
+
+    <div class="search-bar">
+      <input type="text" id="foodSearch" placeholder="Search by food name or restaurant..." oninput="filterFoods()">
+      <select id="typeFilter" onchange="filterFoods()"><option value="">All Types</option><option value="Vegetarian">Vegetarian</option><option value="Non-Vegetarian">Non-Veg</option><option value="Vegan">Vegan</option><option value="Jain">Jain</option></select>
+      <select id="cityFilter" onchange="filterFoods()"><option value="">All Cities</option><option value="Mangaluru">Mangaluru</option><option value="Bangalore">Bangalore</option><option value="Mysuru">Mysuru</option></select>
+      <button class="filter-btn" onclick="filterFoods()">Filter</button>
+    </div>
+
+    <div class="food-grid" id="foodGrid"></div>
+  </div>
+  <footer>© 2024 FoodBridge &nbsp;|&nbsp; <span>Zero Hunger</span></footer>
+</div>
+
+<!-- ==================== FOOD REQUEST ==================== -->
+<div class="page" id="page-request">
+  <div class="form-page" style="max-width:620px">
+    <div class="form-header">
+      <div class="icon-wrap" style="background:#E8EEF5">📥</div>
+      <h2>Request Food Donation</h2>
+      <p id="requestFoodTitle">Submit a request for the selected food donation</p>
+    </div>
+    <div class="card-form">
+      <form onsubmit="event.preventDefault(); handleRequestFood(this);">
+        <input type="hidden" id="reqDonationId">
+        <div id="requestFoodInfo" style="background:var(--green-pale);border-radius:10px;padding:14px 16px;margin-bottom:18px">
+          <strong style="color:var(--green);font-size:14px">Selected Food</strong>
+          <div id="requestFoodDetails" style="font-size:13px;color:var(--text-muted);margin-top:4px"></div>
+        </div>
+        <div class="form-group"><label>Organization Name</label><input type="text" id="reqOrgName" required placeholder="Your registered org name"></div>
+        <div class="form-group"><label>Representative Name</label><input type="text" id="reqRepName" required placeholder="Authorized representative"></div>
+        <div class="form-row">
+          <div class="form-group"><label>Contact Number</label><input type="tel" id="reqPhone" required placeholder="Phone"></div>
+          <div class="form-group"><label>No. of Beneficiaries</label><input type="number" id="reqBeneficiaries" required placeholder="People to serve"></div>
+        </div>
+        <div class="form-group"><label>Pickup / Delivery Preference</label>
+          <select id="reqPref"><option>Self Pickup</option><option>Volunteer Delivery Needed</option></select>
+        </div>
+        <div class="form-group"><label>Delivery Address</label><textarea id="reqAddress" required placeholder="Where should the food be delivered?"></textarea></div>
+        <div class="form-group"><label>Additional Notes</label><textarea id="reqNotes" placeholder="Special requirements, dietary restrictions, urgency..."></textarea></div>
+        <button type="submit" class="btn-submit navy">Submit Request</button>
+      </form>
+    </div>
+  </div>
+  <footer>© 2024 FoodBridge &nbsp;|&nbsp; <span>Zero Hunger</span></footer>
+</div>
+
+<!-- ==================== TRACKING ==================== -->
+<div class="page" id="page-tracking">
+  <div class="tracking-wrap">
+    <div style="text-align:center;margin-bottom:32px">
+      <h2 style="font-family:var(--font-display);font-size:28px;color:var(--navy)">Delivery Tracking</h2>
+      <p style="color:var(--text-muted)">Enter your donation or delivery ID to track status</p>
+    </div>
+    <div class="search-bar" style="max-width:500px;margin:0 auto 32px">
+      <input type="text" placeholder="Enter Donation ID (e.g. FB-2024-1)" id="trackInput">
+      <button class="filter-btn" onclick="handleTracking()">Track</button>
+    </div>
+    <div id="trackingResult" style="display:none">
+      <!-- Loaded dynamically via JS -->
+    </div>
+  </div>
+  <footer>© 2024 FoodBridge &nbsp;|&nbsp; <span>Zero Hunger</span></footer>
+</div>
+
+<!-- ==================== ADMIN LOGIN ==================== -->
+<div class="page" id="page-admin-login">
+  <div class="form-page" style="max-width:440px">
+    <div class="form-header">
+      <div class="icon-wrap" style="background:var(--coral-pale)">🔐</div>
+      <h2>Admin Login</h2>
+      <p>Restricted access — authorized personnel only</p>
+    </div>
+    <div class="card-form">
+      <form onsubmit="event.preventDefault(); handleLogin('admin', this);">
+        <div class="alert alert-warn">⚠️ Demo: Use admin@foodbridge.com / admin123</div>
+        <div class="form-group"><label>Email Address</label><input type="email" name="email" required placeholder="admin@foodbridge.com"></div>
+        <div class="form-group"><label>Password</label><input type="password" name="password" required placeholder="••••••••"></div>
+        <button type="submit" class="btn-submit" style="background:var(--coral)">Login to Admin Panel</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ADMIN DASHBOARD ==================== -->
+<div class="page" id="page-admin">
+  <div class="admin-layout">
+    <div class="admin-sidebar">
+      <div class="sidebar-logo"><span>🍃 FoodBridge Admin</span></div>
+      <div class="sidebar-link active" onclick="showAdminTab('overview')"><span class="icon">📊</span>Overview</div>
+      <div class="sidebar-link" onclick="showAdminTab('restaurants')"><span class="icon">🍽️</span>Restaurants</div>
+      <div class="sidebar-link" onclick="showAdminTab('receivers')"><span class="icon">🏠</span>Receiver Orgs</div>
+      <div class="sidebar-link" onclick="showAdminTab('volunteers')"><span class="icon">🚴</span>Volunteers</div>
+      <div class="sidebar-link" onclick="showAdminTab('donations')"><span class="icon">🍛</span>Donations</div>
+      <div class="sidebar-link" onclick="showAdminTab('deliveries')"><span class="icon">📦</span>Deliveries</div>
+      <div class="sidebar-link" style="margin-top:auto;color:var(--coral-pale)" onclick="handleLogout()"><span class="icon">↩️</span>Logout</div>
+    </div>
+    <div class="admin-main" id="adminContent">
+      <!-- Filled by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ==================== CONTACT ==================== -->
+<div class="page" id="page-contact">
+  <div style="text-align:center;padding:60px 24px 40px;background:var(--white);border-bottom:1px solid #E8E8E2">
+    <h1 style="font-family:var(--font-display);font-size:36px;color:var(--navy);margin-bottom:10px">Contact Us</h1>
+    <p style="color:var(--text-muted)">Have questions? We'd love to hear from you.</p>
+  </div>
+  <div class="contact-wrap">
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h3>Get in Touch</h3>
+        <p>We're here to help onboard restaurants, NGOs, and volunteers onto the FoodBridge network.</p>
+        <div class="contact-item"><div class="ci-icon">📍</div><div><h4>Address</h4><p>Mangaluru, Karnataka, India — 575001</p></div></div>
+        <div class="contact-item"><div class="ci-icon">📧</div><div><h4>Email</h4><p>contact@foodbridge.org</p></div></div>
+        <div class="contact-item"><div class="ci-icon">📞</div><div><h4>Phone</h4><p>+91 98765 43210</p></div></div>
+        <div class="contact-item"><div class="ci-icon">🕐</div><div><h4>Working Hours</h4><p>Mon – Sat, 8:00 AM – 8:00 PM</p></div></div>
+      </div>
+      <div class="contact-form">
+        <div class="form-group"><label>Your Name</label><input type="text" placeholder="Full name"></div>
+        <div class="form-group"><label>Email</label><input type="email" placeholder="your@email.com"></div>
+        <div class="form-group"><label>Subject</label>
+          <select><option>General Inquiry</option><option>Restaurant Onboarding</option><option>NGO Partnership</option><option>Volunteer Query</option><option>Technical Issue</option></select>
+        </div>
+        <div class="form-group"><label>Message</label><textarea placeholder="Describe your question or concern..." style="min-height:120px"></textarea></div>
+        <button class="btn-submit" onclick="showModal('contactModal')">Send Message</button>
+      </div>
+    </div>
+  </div>
+  <footer>© 2024 FoodBridge &nbsp;|&nbsp; <span>Zero Hunger</span></footer>
+</div>
+
+<!-- ==================== MODALS ==================== -->
+<div class="modal-overlay" id="regModal">
+  <div class="modal">
+    <h3>✅ Registration Submitted!</h3>
+    <p>Your registration has been received. You can now log in to explore your dashboard!</p>
+    <div class="modal-btns"><button class="btn-confirm" onclick="closeModal('regModal');showPage('home')">Back to Home</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="requestModal">
+  <div class="modal">
+    <h3>📥 Request Submitted!</h3>
+    <p>Your food request has been successfully processed. Use the Tracking ID below to monitor delivery status.</p>
+    <div style="background:#f4f4f4;padding:12px;border-radius:8px;margin-bottom:20px;text-align:center;font-weight:bold;color:var(--navy);">
+      Your Tracking ID: <span id="requestModalTrackingId" style="color:var(--green)"></span>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal('requestModal')">Close</button>
+      <button class="btn-confirm" onclick="closeModal('requestModal');showPage('tracking')">Track Delivery</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="updateModal">
+  <div class="modal">
+    <h3>📦 Update Delivery Status</h3>
+    <input type="hidden" id="updateDeliveryId">
+    <div class="form-group" style="margin-bottom:16px"><label>New Status</label>
+      <select id="updateStatusValue">
+        <option value="requested">Requested</option>
+        <option value="assigned">Assigned</option>
+        <option value="picked_up">Picked Up</option>
+        <option value="delivered">Delivered</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-bottom:16px"><label>Notes</label><textarea id="updateStatusNotes" style="min-height:70px;width:100%;padding:10px 12px;border:1.5px solid #DDDDD6;border-radius:8px;font-family:var(--font-body);font-size:14px;outline:none" placeholder="Any delivery notes..."></textarea></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal('updateModal')">Cancel</button>
+      <button class="btn-confirm" onclick="submitStatusUpdate()">Update Status</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="contactModal">
+  <div class="modal">
+    <h3>📨 Message Sent!</h3>
+    <p>Thanks for reaching out! Our team will get back to you at your email within one business day.</p>
+    <div class="modal-btns"><button class="btn-confirm" onclick="closeModal('contactModal')">Done</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="approveModal">
+  <div class="modal">
+    <h3>✅ Approved!</h3>
+    <p id="approveMsg">The user has been approved successfully.</p>
+    <div class="modal-btns"><button class="btn-confirm" onclick="closeModal('approveModal')">Done</button></div>
+  </div>
+</div>
+
+<!-- ==================== LOCAL DATABASE SCRIPT ==================== -->
+<script>
+// ─── LOCAL DATABASE MANAGER ───
+const LocalDB = {
+  // Database Initial Mock State
+  init() {
+    if (!localStorage.getItem('fb_db_initialized')) {
+      const defaultAdmins = [
+        { id: 1, username: 'Super Admin', email: 'admin@foodbridge.com', password: 'admin123', role: 'admin', last_login: null, created_at: new Date().toISOString() }
+      ];
+      
+      const defaultRestaurants = [
+        { id: 'R001', name: 'Spice Garden Restaurant', owner_name: 'Ramesh Shetty', email: 'spice@garden.com', phone: '9876543210', address: 'MG Road, near Mall', city: 'Mangaluru', fssai_no: 'FSSAI12345', password: 'password', status: 'approved', created_at: new Date().toISOString() },
+        { id: 'R002', name: 'Green Leaf Dhaba', owner_name: 'Priya Nair', email: 'green@leaf.com', phone: '9876543211', address: 'Hampankatta, Circle', city: 'Mangaluru', fssai_no: 'FSSAI67890', password: 'password', status: 'approved', created_at: new Date().toISOString() },
+        { id: 'R003', name: 'Northern Spice', owner_name: 'Amit Gupta', email: 'north@spice.com', phone: '9876543212', address: 'Koramangala 5th Block', city: 'Bangalore', fssai_no: 'FSSAI54321', password: 'password', status: 'pending', created_at: new Date().toISOString() },
+        { id: 'R004', name: 'Coastal Kitchen', owner_name: 'Joseph Mathew', email: 'coastal@kitchen.com', phone: '9876543213', address: 'Bejai, opposite church', city: 'Mangaluru', fssai_no: 'FSSAI98765', password: 'password', status: 'approved', created_at: new Date().toISOString() }
+      ];
+
+      const defaultReceivers = [
+        { id: 'O001', org_name: 'Helping Hands NGO', org_type: 'NGO', rep_name: 'Sunita Rao', email: 'help@hands.org', phone: '9123456780', address: 'Kodialbail, Mangaluru', city: 'Mangaluru', reg_no: 'REG111', beneficiaries_count: 150, password: 'password', status: 'approved', created_at: new Date().toISOString() },
+        { id: 'O002', org_name: 'Holy Cross Orphanage', org_type: 'Orphanage', rep_name: 'Sr. Maria', email: 'holy@cross.org', phone: '9123456781', address: 'Kulshekar, Mangaluru', city: 'Mangaluru', reg_no: 'REG222', beneficiaries_count: 80, password: 'password', status: 'approved', created_at: new Date().toISOString() },
+        { id: 'O003', org_name: 'Ramakrishna Ashram', org_type: 'Ashram', rep_name: 'Swami Prakash', email: 'rk@ashram.org', phone: '9123456782', address: 'Vontikoppal, Mysuru', city: 'Mysuru', reg_no: 'REG333', beneficiaries_count: 60, password: 'password', status: 'pending', created_at: new Date().toISOString() }
+      ];
+
+      const defaultVolunteers = [
+        { id: 'V001', first_name: 'Ravi', last_name: 'Kumar', email: 'ravi@volunteer.com', phone: '98765XXXXX', city: 'Mangaluru', aadhar_no: 'AADHAR111', vehicle_type: 'Two-Wheeler', availability: 'Weekends', about: 'Happy to deliver food', password: 'password', status: 'approved', registered_at: new Date().toISOString() },
+        { id: 'V002', first_name: 'Ananya', last_name: 'Das', email: 'ananya@volunteer.com', phone: '87654XXXXX', city: 'Mangaluru', aadhar_no: 'AADHAR222', vehicle_type: 'Bicycle', availability: 'Weekdays', about: 'Love helping out', password: 'password', status: 'approved', registered_at: new Date().toISOString() },
+        { id: 'V003', first_name: 'Mohammed', last_name: 'Arif', email: 'arif@volunteer.com', phone: '76543XXXXX', city: 'Bangalore', aadhar_no: 'AADHAR333', vehicle_type: 'Car', availability: 'Anytime', about: 'Ready to drive', password: 'password', status: 'pending', registered_at: new Date().toISOString() }
+      ];
+
+      // Expiry is set to future date so they appear on dashboard
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = tomorrow.toISOString().slice(0, 16);
+
+      const defaultDonations = [
+        { donation_id: 1, restaurant_id: 'R001', restaurant_name: 'Spice Garden Restaurant', food_name: 'Chicken Biryani', quantity: 60, food_type: 'Non-Vegetarian', packaging: 'Packed in containers', prep_time: new Date().toISOString().slice(0, 16), expiry_time: tomorrowStr, pickup_address: 'MG Road, near Mall', pickup_city: 'Mangaluru', pickup_phone: '9876543210', special_instructions: 'Keep hot', status: 'available', created_at: new Date().toISOString() },
+        { donation_id: 2, restaurant_id: 'R002', restaurant_name: 'Green Leaf Dhaba', food_name: 'Dal Tadka & Rice', quantity: 100, food_type: 'Vegetarian', packaging: 'Loose / Bulk', prep_time: new Date().toISOString().slice(0, 16), expiry_time: tomorrowStr, pickup_address: 'Hampankatta, Circle', pickup_city: 'Mangaluru', pickup_phone: '9876543211', special_instructions: 'Handle with care', status: 'completed', created_at: new Date().toISOString() },
+        { donation_id: 3, restaurant_id: 'R001', restaurant_name: 'Spice Garden Restaurant', food_name: 'Chapati & Sabzi', quantity: 80, food_type: 'Vegetarian', packaging: 'Sealed packets', prep_time: new Date().toISOString().slice(0, 16), expiry_time: tomorrowStr, pickup_address: 'MG Road, near Mall', pickup_city: 'Bangalore', pickup_phone: '9876543210', special_instructions: '', status: 'requested', created_at: new Date().toISOString() }
+      ];
+
+      const defaultDeliveries = [
+        { delivery_id: 1, donation_id: 3, receiver_id: 'O001', receiver_name: 'Helping Hands NGO', volunteer_id: 'V001', volunteer_name: 'Ravi Kumar', vehicle_type: 'Two-Wheeler', status: 'requested', pickup_time: null, delivered_at: null, notes: 'Awaiting dispatch approval', created_at: new Date().toISOString() },
+        { delivery_id: 2, donation_id: 2, receiver_id: 'O002', receiver_name: 'Holy Cross Orphanage', volunteer_id: 'V002', volunteer_name: 'Ananya Das', vehicle_type: 'Bicycle', status: 'delivered', pickup_time: new Date().toISOString(), delivered_at: new Date().toISOString(), notes: 'Delivered successfully!', created_at: new Date().toISOString() }
+      ];
+
+      localStorage.setItem('fb_admins', JSON.stringify(defaultAdmins));
+      localStorage.setItem('fb_restaurants', JSON.stringify(defaultRestaurants));
+      localStorage.setItem('fb_receivers', JSON.stringify(defaultReceivers));
+      localStorage.setItem('fb_volunteers', JSON.stringify(defaultVolunteers));
+      localStorage.setItem('fb_donations', JSON.stringify(defaultDonations));
+      localStorage.setItem('fb_deliveries', JSON.stringify(defaultDeliveries));
+      localStorage.setItem('fb_db_initialized', 'true');
+    }
+  },
+
+  getTable(name) {
+    this.init();
+    return JSON.parse(localStorage.getItem('fb_' + name)) || [];
+  },
+
+  saveTable(name, data) {
+    localStorage.setItem('fb_' + name, JSON.stringify(data));
+  },
+
+  // Auth Operations
+  register(type, data) {
+    const table = this.getTable(type + 's');
+    // Check email uniqueness
+    const allTables = ['restaurants', 'receivers', 'volunteers', 'admins'];
+    for (let t of allTables) {
+      const records = this.getTable(t);
+      if (records.some(r => r.email === data.email)) {
+        return { success: false, message: 'Email address already registered!' };
+      }
+    }
+
+    const idPrefix = type === 'restaurant' ? 'R' : type === 'receiver' ? 'O' : 'V';
+    const newId = idPrefix + String(table.length + 1).padStart(3, '0');
+    data.id = newId;
+    data.status = type === 'volunteer' ? 'approved' : 'pending'; // Volunteers auto-approved for simplicity
+    data.created_at = new Date().toISOString();
+
+    table.push(data);
+    this.saveTable(type + 's', table);
+    return { success: true };
+  },
+
+  login(type, email, password) {
+    const table = this.getTable(type + 's');
+    const user = table.find(u => u.email === email && u.password === password);
+    if (!user) {
+      return { success: false, message: 'Invalid credentials' };
+    }
+    if (user.status === 'pending') {
+      return { success: false, message: 'Your account is pending admin approval.' };
+    }
+    if (user.status === 'rejected') {
+      return { success: false, message: 'Your account has been rejected.' };
+    }
+
+    // Set Session
+    const sessionUser = {
+      id: user.id || user.admin_id,
+      name: user.name || user.org_name || (user.first_name ? user.first_name + ' ' + user.last_name : '') || user.username,
+      type: type
+    };
+    sessionStorage.setItem('fb_current_user', JSON.stringify(sessionUser));
+
+    if (type === 'admin') {
+      user.last_login = new Date().toISOString();
+      this.saveTable('admins', table);
+    }
+    return { success: true, user: sessionUser };
+  },
+
+  logout() {
+    sessionStorage.removeItem('fb_current_user');
+  },
+
+  getCurrentUser() {
+    return JSON.parse(sessionStorage.getItem('fb_current_user')) || null;
+  },
+
+  // Donations Flow
+  addDonation(foodName, quantity, foodType, packaging, prepTime, expiryTime, address, city, phone, instructions) {
+    const user = this.getCurrentUser();
+    if (!user || user.type !== 'restaurant') return { success: false, message: 'Unauthorized' };
+
+    const donations = this.getTable('donations');
+    const newId = donations.length + 1;
+
+    const newDonation = {
+      donation_id: newId,
+      restaurant_id: user.id,
+      restaurant_name: user.name,
+      food_name: foodName,
+      quantity: parseInt(quantity),
+      food_type: foodType,
+      packaging: packaging,
+      prep_time: prepTime,
+      expiry_time: expiryTime,
+      pickup_address: address,
+      pickup_city: city,
+      pickup_phone: phone,
+      special_instructions: instructions,
+      status: 'available',
+      created_at: new Date().toISOString()
+    };
+
+    donations.push(newDonation);
+    this.saveTable('donations', donations);
+    return { success: true, donation_id: newId };
+  },
+
+  getDonations() {
+    const donations = this.getTable('donations');
+    // Filter out expired items
+    const now = new Date();
+    return donations.filter(d => d.status === 'available' && new Date(d.expiry_time) > now);
+  },
+
+  requestFood(donationId, orgName, repName, phone, beneficiaries, preference, address, notes) {
+    const user = this.getCurrentUser();
+    if (!user || user.type !== 'receiver') return { success: false, message: 'Unauthorized' };
+
+    const donations = this.getTable('donations');
+    const donation = donations.find(d => d.donation_id == donationId);
+    if (!donation || donation.status !== 'available') {
+      return { success: false, message: 'This food donation is no longer available!' };
+    }
+
+    donation.status = 'requested';
+    this.saveTable('donations', donations);
+
+    const deliveries = this.getTable('deliveries');
+    const newDelId = deliveries.length + 1;
+
+    const newDelivery = {
+      delivery_id: newDelId,
+      donation_id: parseInt(donationId),
+      receiver_id: user.id,
+      receiver_name: user.name,
+      volunteer_id: null,
+      volunteer_name: null,
+      vehicle_type: null,
+      status: 'requested',
+      pickup_time: null,
+      delivered_at: null,
+      notes: notes || 'Delivery requested',
+      created_at: new Date().toISOString()
+    };
+
+    deliveries.push(newDelivery);
+    this.saveTable('deliveries', deliveries);
+    return { success: true };
+  },
+
+  // Tracking
+  getDeliveryDetails(donationId) {
+    const deliveries = this.getTable('deliveries');
+    const d = deliveries.find(del => del.donation_id == donationId);
+    if (!d) return null;
+
+    const donations = this.getTable('donations');
+    const don = donations.find(x => x.donation_id == donationId);
+
+    return {
+      delivery_id: d.delivery_id,
+      donation_id: d.donation_id,
+      food_name: don ? don.food_name : 'Food item',
+      quantity: don ? don.quantity : 0,
+      restaurant_name: don ? don.restaurant_name : 'Restaurant',
+      receiver_name: d.receiver_name,
+      vol_first: d.volunteer_name ? d.volunteer_name.split(' ')[0] : '',
+      vol_last: d.volunteer_name ? d.volunteer_name.split(' ').slice(1).join(' ') : '',
+      vehicle_type: d.vehicle_type,
+      status: d.status,
+      notes: d.notes,
+      created_at: d.created_at,
+      pickup_time: d.pickup_time,
+      delivered_at: d.delivered_at
+    };
+  },
+
+  updateDelivery(donationId, status, notes) {
+    const deliveries = this.getTable('deliveries');
+    const d = deliveries.find(del => del.donation_id == donationId);
+    if (!d) return { success: false, message: 'Delivery not found' };
+
+    d.status = status;
+    d.notes = notes;
+    if (status === 'picked_up') {
+      d.pickup_time = new Date().toISOString();
+    } else if (status === 'delivered') {
+      d.delivered_at = new Date().toISOString();
+      // Also update the donation table status to completed
+      const donations = this.getTable('donations');
+      const don = donations.find(x => x.donation_id == donationId);
+      if (don) {
+        don.status = 'completed';
+        this.saveTable('donations', donations);
+      }
+    }
+
+    this.saveTable('deliveries', deliveries);
+    return { success: true };
+  },
+
+  // Admin Operations
+  getPendingUsers() {
+    const pending = [];
+    
+    this.getTable('restaurants').forEach(r => {
+      if (r.status === 'pending') pending.push({ id: r.id, name: r.name, email: r.email, type: 'restaurant', date: r.created_at });
+    });
+
+    this.getTable('receivers').forEach(r => {
+      if (r.status === 'pending') pending.push({ id: r.id, name: r.org_name, email: r.email, type: 'receiver', date: r.created_at });
+    });
+
+    this.getTable('volunteers').forEach(v => {
+      if (v.status === 'pending') pending.push({ id: v.id, name: v.first_name + ' ' + v.last_name, email: v.email, type: 'volunteer', date: v.registered_at });
+    });
+
+    return pending;
+  },
+
+  approveUser(id, type) {
+    const table = this.getTable(type + 's');
+    const user = table.find(u => u.id === id);
+    if (!user) return { success: false, message: 'User not found' };
+
+    user.status = 'approved';
+    this.saveTable(type + 's', table);
+    return { success: true };
+  },
+
+  getStats() {
+    const donations = this.getTable('donations');
+    const deliveries = this.getTable('deliveries');
+
+    const now = new Date();
+    const active = donations.filter(d => d.status === 'available' && new Date(d.expiry_time) > now).length;
+    const requested = deliveries.filter(d => d.status === 'requested').length;
+    
+    // Delivered today
+    const startOfToday = new Date();
+    startOfToday.setHours(0,0,0,0);
+    const completed = deliveries.filter(d => d.status === 'delivered' && d.delivered_at && new Date(d.delivered_at) >= startOfToday).length;
+    
+    const enroute = deliveries.filter(d => d.status === 'picked_up' || d.status === 'assigned').length;
+
+    return { active, requested, completed, enroute };
+  },
+
+  getHomeStats() {
+    const donations = this.getTable('donations');
+    // Sum of servings listed
+    const meals = donations.reduce((sum, d) => sum + d.quantity, 0);
+    const rests = this.getTable('restaurants').filter(r => r.status === 'approved').length;
+    const orgs = this.getTable('receivers').filter(o => o.status === 'approved').length;
+    const vols = this.getTable('volunteers').filter(v => v.status === 'approved').length;
+
+    return { meals, rests, orgs, vols };
+  }
+};
+</script>
+
+<!-- ==================== FRONTEND CONTROLLER ==================== -->
+<script>
+// ─── UTILITIES & PAGE ROUTING ───
+function showPage(page) {
+  // Check Access Permissions
+  const currentUser = LocalDB.getCurrentUser();
+  if (page === 'donate' && (!currentUser || currentUser.type !== 'restaurant')) {
+    alert("Please log in as a Restaurant to post food donations!");
+    showPage('restaurant-auth');
+    return;
+  }
+  if (page === 'request' && (!currentUser || currentUser.type !== 'receiver')) {
+    alert("Please log in as a Receiver Organization to request food!");
+    showPage('receiver-auth');
+    return;
+  }
+  if (page === 'admin' && (!currentUser || currentUser.type !== 'admin')) {
+    alert("Admin login required!");
+    showPage('admin-login');
+    return;
+  }
+
+  // Handle active states
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+
+  const el = document.getElementById('page-' + page);
+  if (el) el.classList.add('active');
+
+  const navEl = document.getElementById('nav-' + page);
+  if (navEl) navEl.classList.add('active');
+
+  window.scrollTo(0,0);
+  document.getElementById('navLinks').classList.remove('open');
+
+  // Load context specific data
+  if (page === 'home') {
+    loadHomeStats();
+  } else if (page === 'dashboard') {
+    loadDonations();
+    loadStats();
+  } else if (page === 'admin') {
+    renderAdminOverview();
+  }
+}
+
+function toggleMenu() {
+  document.getElementById('navLinks').classList.toggle('open');
+}
+
+function switchTab(prefix, tab) {
+  document.querySelectorAll(`#${prefix}-login, #${prefix}-register`).forEach(el => el.style.display = 'none');
+  document.getElementById(`${prefix}-${tab}`).style.display = 'block';
+  
+  // Toggle tab headers
+  const container = document.getElementById(`page-${prefix === 'r' ? 'restaurant' : 'receiver'}-auth`);
+  const tabs = container.querySelectorAll('.tab');
+  tabs[0].classList.toggle('active', tab === 'login');
+  tabs[1].classList.toggle('active', tab === 'register');
+}
+
+// ─── AUTH CONTROLLERS ───
+function handleRegister(type, form) {
+  const formData = new FormData(form);
+  const data = {};
+  formData.forEach((value, key) => data[key] = value);
+
+  if (data.password !== data.confirm_password) {
+    alert("Passwords do not match!");
+    return;
+  }
+  delete data.confirm_password;
+
+  const res = LocalDB.register(type, data);
+  if (res.success) {
+    showModal('regModal');
+    form.reset();
+  } else {
+    alert(res.message);
+  }
+}
+
+function handleLogin(type, form) {
+  const email = form.email.value;
+  const password = form.password.value;
+
+  const res = LocalDB.login(type, email, password);
+  if (res.success) {
+    form.reset();
+    updateNavBar();
+    if (res.user.type === 'restaurant') {
+      showPage('donate');
+    } else if (res.user.type === 'admin') {
+      showPage('admin');
+    } else {
+      showPage('dashboard');
+    }
+  } else {
+    alert(res.message);
+  }
+}
+
+function handleLogout() {
+  LocalDB.logout();
+  updateNavBar();
+  showPage('home');
+}
+
+function updateNavBar() {
+  const user = LocalDB.getCurrentUser();
+  const authArea = document.getElementById('navAuthArea');
+  if (user) {
+    let panelBtn = '';
+    if (user.type === 'restaurant') {
+      panelBtn = `<button class="nav-btn" onclick="showPage('donate')">Post Donation</button>`;
+    } else if (user.type === 'receiver') {
+      panelBtn = `<button class="nav-btn" onclick="showPage('dashboard')">Food Board</button>`;
+    } else if (user.type === 'admin') {
+      panelBtn = `<button class="nav-btn" style="background:var(--coral)" onclick="showPage('admin')">Admin Panel</button>`;
+    }
+
+    authArea.innerHTML = `
+      <span style="font-size: 13px; color: var(--text-muted); font-weight: 500; display: inline-block; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">👤 ${user.name}</span>
+      ${panelBtn}
+      <button class="nav-btn" style="background:var(--gray-dark)" onclick="handleLogout()">Logout</button>
+      <div class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+    `;
+  } else {
+    authArea.innerHTML = `
+      <button class="nav-btn" onclick="showPage('restaurant-auth')">Restaurant</button>
+      <button class="nav-btn" style="background:var(--navy)" onclick="showPage('receiver-auth')">Receiver</button>
+      <div class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+    `;
+  }
+}
+
+// ─── FOOD & DONATION CONTROLLERS ───
+let allDonations = [];
+
+function loadDonations() {
+  allDonations = LocalDB.getDonations();
+  renderFoods(allDonations);
+}
+
+function renderFoods(data) {
+  const grid = document.getElementById('foodGrid');
+  if (!data.length) {
+    grid.innerHTML = '<div class="empty-state"><div class="icon">🍽️</div><p>No food listings match your search.</p></div>';
+    return;
+  }
+  
+  grid.innerHTML = data.map(f => {
+    const statusBadge = f.status === 'available'
+      ? '<span class="badge badge-green">● Available</span>'
+      : f.status === 'requested' ? '<span class="badge badge-amber">⏳ Requested</span>'
+      : '<span class="badge badge-navy">🚴 En Route</span>';
+
+    const typeBadge = f.food_type === 'Vegetarian' || f.food_type === 'Vegan' || f.food_type === 'Jain'
+      ? '<span class="badge" style="background:#D8F3DC;color:#1A5C38;font-size:11px">🟢 Veg</span>'
+      : '<span class="badge" style="background:var(--coral-pale);color:#8B3820;font-size:11px">🔴 Non-Veg</span>';
+
+    return `<div class="food-card">
+      <div class="food-img"><div class="food-tag">${statusBadge}</div><span>🍛</span></div>
+      <div class="food-body">
+        <h4>${f.food_name}</h4>
+        <div class="food-meta">
+          <span>${typeBadge}</span>
+          <span style="margin-top:4px;display:block;font-size:12px">📍 ${f.pickup_city} &nbsp;|&nbsp; ⏰ Safe till ${new Date(f.expiry_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+          <span style="font-size:12px">🍽️ ${f.quantity} servings</span>
+        </div>
+        <div class="food-footer">
+          <div class="restaurant">🏪 ${f.restaurant_name}</div>
+          ${f.status === 'available'
+            ? `<button class="btn-sm btn-green" onclick="initiateRequest(${f.donation_id},'${f.food_name}','${f.restaurant_name}',${f.quantity})">Request</button>`
+            : `<button class="btn-sm btn-outline-sm" onclick="showTrackItem(${f.donation_id})">Track</button>`}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterFoods() {
+  const q = document.getElementById('foodSearch').value.toLowerCase();
+  const type = document.getElementById('typeFilter').value;
+  const city = document.getElementById('cityFilter').value;
+
+  const filtered = allDonations.filter(f =>
+    (!q || f.food_name.toLowerCase().includes(q) || f.restaurant_name.toLowerCase().includes(q)) &&
+    (!type || f.food_type === type) &&
+    (!city || f.pickup_city.toLowerCase() === city.toLowerCase())
+  );
+  renderFoods(filtered);
+}
+
+function handlePostDonation(form) {
+  const name = form.food_name.value;
+  const qty = form.quantity.value;
+  const type = form.food_type.value;
+  const packaging = form.packaging.value;
+  const prep = form.prep_time.value;
+  const expiry = form.expiry_time.value;
+  const addr = form.pickup_address.value;
+  const city = form.city.value;
+  const phone = form.pickup_phone.value;
+  const instructions = form.special_instructions.value;
+
+  const res = LocalDB.addDonation(name, qty, type, packaging, prep, expiry, addr, city, phone, instructions);
+  if (res.success) {
+    form.reset();
+    alert("Success! Your Food Donation Tracking ID is: FB-2024-" + res.donation_id + "\nSave this ID to track your donation.");
+    showPage('dashboard');
+  } else {
+    alert(res.message);
+  }
+}
+
+// ─── REQUEST CONTROLLERS ───
+function initiateRequest(id, name, rest, qty) {
+  const user = LocalDB.getCurrentUser();
+  if (!user || user.type !== 'receiver') {
+    alert("Please log in as a Receiver Organization to request food!");
+    showPage('receiver-auth');
+    return;
+  }
+
+  // Pre-fill receiver organization details
+  const receiverDetails = LocalDB.getTable('receivers').find(r => r.id === user.id);
+
+  document.getElementById('reqDonationId').value = id;
+  document.getElementById('requestFoodTitle').textContent = `Request: ${name}`;
+  document.getElementById('requestFoodDetails').textContent = `${qty} servings from ${rest}`;
+  
+  if (receiverDetails) {
+    document.getElementById('reqOrgName').value = receiverDetails.org_name;
+    document.getElementById('reqRepName').value = receiverDetails.rep_name;
+    document.getElementById('reqPhone').value = receiverDetails.phone;
+    document.getElementById('reqBeneficiaries').value = receiverDetails.beneficiaries_count || 0;
+    document.getElementById('reqAddress').value = receiverDetails.address;
+  }
+
+  showPage('request');
+}
+
+function handleRequestFood(form) {
+  const id = document.getElementById('reqDonationId').value;
+  const orgName = document.getElementById('reqOrgName').value;
+  const repName = document.getElementById('reqRepName').value;
+  const phone = document.getElementById('reqPhone').value;
+  const beneficiaries = document.getElementById('reqBeneficiaries').value;
+  const pref = document.getElementById('reqPref').value;
+  const address = document.getElementById('reqAddress').value;
+  const notes = document.getElementById('reqNotes').value;
+
+  const res = LocalDB.requestFood(id, orgName, repName, phone, beneficiaries, pref, address, notes);
+  if (res.success) {
+    form.reset();
+    document.getElementById('requestModalTrackingId').innerText = "FB-2024-" + id;
+    showModal('requestModal');
+  } else {
+    alert(res.message);
+  }
+}
+
+// ─── STATS & HOME ───
+function loadStats() {
+  const stats = LocalDB.getStats();
+  document.getElementById('statActive').innerText = stats.active;
+  document.getElementById('statRequested').innerText = stats.requested;
+  document.getElementById('statCompleted').innerText = stats.completed;
+  document.getElementById('statEnroute').innerText = stats.enroute;
+}
+
+function loadHomeStats() {
+  const stats = LocalDB.getHomeStats();
+  document.getElementById('homeMeals').innerText = stats.meals + '+';
+  document.getElementById('homeRests').innerText = stats.rests;
+  document.getElementById('homeOrgs').innerText = stats.orgs;
+  document.getElementById('homeVols').innerText = stats.vols;
+}
+
+// ─── TRACKING CONTROLLERS ───
+function showTrackItem(donationId) {
+  document.getElementById('trackInput').value = "FB-2024-" + donationId;
+  showPage('tracking');
+  handleTracking();
+}
+
+function handleTracking() {
+  const input = document.getElementById('trackInput').value;
+  const parts = input.split('-');
+  const donationId = parts[parts.length - 1];
+
+  if (!donationId || isNaN(donationId)) {
+    alert("Please enter a valid tracking ID (e.g., FB-2024-1)");
+    return;
+  }
+
+  const d = LocalDB.getDeliveryDetails(donationId);
+  const resultDiv = document.getElementById('trackingResult');
+
+  if (d) {
+    const isVolunteerOrAdmin = LocalDB.getCurrentUser() && (LocalDB.getCurrentUser().type === 'volunteer' || LocalDB.getCurrentUser().type === 'admin');
+    const updateBtnHtml = isVolunteerOrAdmin
+      ? `<div style="margin-top:24px;padding-top:20px;border-top:1px solid #EEEEE8">
+           <button class="btn-sm btn-outline-sm" onclick="openUpdateStatusModal(${d.donation_id}, '${d.status}')">Update Delivery Status</button>
+         </div>`
+      : '';
+
+    // Calculate timeline step classes
+    const step1 = 'done';
+    const step2 = (d.status !== 'requested') ? 'done' : 'active';
+    const step3 = (d.status === 'assigned' || d.status === 'picked_up' || d.status === 'delivered') ? 'done' : (d.status === 'requested' ? '' : 'active');
+    const step4 = (d.status === 'picked_up' || d.status === 'delivered') ? 'done' : (d.status === 'assigned' ? 'active' : '');
+    const step5 = (d.status === 'delivered') ? 'done' : (d.status === 'picked_up' ? 'active' : '');
+
+    resultDiv.innerHTML = `
+      <div class="tracking-card">
+        <div class="tracking-top">
+          <h3>🍛 ${d.food_name} — ${d.quantity} Servings</h3>
+          <p>Donation ID: FB-2024-${d.donation_id} &nbsp;|&nbsp; ${d.restaurant_name} → ${d.receiver_name}</p>
+        </div>
+        <div class="tracking-body">
+          <div style="display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap">
+            <div><div style="font-size:12px;color:var(--text-muted)">Volunteer</div><div style="font-weight:600;font-size:14px">${d.vol_first ? d.vol_first + ' ' + d.vol_last : 'Pending Assignment'}</div></div>
+            <div><div style="font-size:12px;color:var(--text-muted)">Vehicle</div><div style="font-weight:600;font-size:14px">${d.vehicle_type || '—'}</div></div>
+            <div><span class="badge ${d.status === 'delivered' ? 'badge-green' : 'badge-amber'}">🚴 ${d.status.toUpperCase()}</span></div>
+          </div>
+          <div style="background:#f9f9f6; padding: 12px; border-radius: 8px; margin-bottom: 24px; border: 1px solid #eeeeeb;">
+            <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: bold;">Status Notes:</div>
+            <div style="font-size: 13px; font-style: italic; margin-top: 4px;">"${d.notes}"</div>
+          </div>
+          <div class="timeline">
+            <div class="tl-step">
+              <div class="tl-dot ${step1}"></div>
+              <div class="tl-content"><h4>Donation Posted</h4><p>Listed by ${d.restaurant_name}</p></div>
+            </div>
+            <div class="tl-step">
+              <div class="tl-dot ${step2}"></div>
+              <div class="tl-content"><h4>Request Raised</h4><p>Requested by receiver org ${d.receiver_name}</p></div>
+            </div>
+            <div class="tl-step">
+              <div class="tl-dot ${step3}"></div>
+              <div class="tl-content"><h4>Volunteer Assigned</h4><p>${d.vol_first ? 'Courier ' + d.vol_first + ' assigned' : 'Waiting for courier assignment'}</p></div>
+            </div>
+            <div class="tl-step">
+              <div class="tl-dot ${step4}"></div>
+              <div class="tl-content"><h4>Food Picked Up</h4><p>${d.pickup_time ? 'Picked up at ' + new Date(d.pickup_time).toLocaleTimeString() : 'Awaiting food pickup'}</p></div>
+            </div>
+            <div class="tl-step">
+              <div class="tl-dot ${step5}"></div>
+              <div class="tl-content"><h4>Delivered</h4><p>${d.delivered_at ? 'Delivered successfully at ' + new Date(d.delivered_at).toLocaleTimeString() : 'In transit / Pending delivery'}</p></div>
+            </div>
+          </div>
+          ${updateBtnHtml}
+        </div>
+      </div>
+    `;
+    resultDiv.style.display = 'block';
+    resultDiv.scrollIntoView({ behavior: 'smooth' });
+  } else {
+    alert("Tracking ID not found. Try 'FB-2024-3' or 'FB-2024-2'.");
+  }
+}
+
+function openUpdateStatusModal(donationId, currentStatus) {
+  document.getElementById('updateDeliveryId').value = donationId;
+  document.getElementById('updateStatusValue').value = currentStatus;
+  document.getElementById('updateStatusNotes').value = '';
+  showModal('updateModal');
+}
+
+function submitStatusUpdate() {
+  const donationId = document.getElementById('updateDeliveryId').value;
+  const status = document.getElementById('updateStatusValue').value;
+  const notes = document.getElementById('updateStatusNotes').value;
+
+  const res = LocalDB.updateDelivery(donationId, status, notes);
+  if (res.success) {
+    closeModal('updateModal');
+    handleTracking();
+  } else {
+    alert(res.message);
+  }
+}
+
+// ─── ADMIN CONTROLLERS ───
+let adminTab = 'overview';
+
+function showAdminTab(tab) {
+  adminTab = tab;
+  
+  // Set link active state
+  const links = document.querySelectorAll('.admin-sidebar .sidebar-link');
+  links.forEach(l => {
+    const onclickText = l.getAttribute('onclick');
+    if (onclickText && onclickText.includes(tab)) {
+      l.classList.add('active');
+    } else {
+      l.classList.remove('active');
+    }
+  });
+
+  if (tab === 'overview') {
+    renderAdminOverview();
+  } else {
+    renderAdminTable(tab);
+  }
+}
+
+function renderAdminOverview() {
+  const pending = LocalDB.getPendingUsers();
+  const recent = LocalDB.getTable('donations').slice(-4).reverse();
+  const stats = LocalDB.getHomeStats();
+
+  document.getElementById('adminContent').innerHTML = `
+    <h2 style="font-family:var(--font-display);font-size:24px;color:var(--navy);margin-bottom:20px">📊 Admin Overview</h2>
+    <div class="metric-row" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
+      <div class="metric-card"><span class="m-icon">🍽️</span><div class="m-num">${stats.rests}</div><div class="m-label">Approved Restaurants</div></div>
+      <div class="metric-card"><span class="m-icon">🏠</span><div class="m-num">${stats.orgs}</div><div class="m-label">Approved Receiver Orgs</div></div>
+      <div class="metric-card"><span class="m-icon">🚴</span><div class="m-num">${stats.vols}</div><div class="m-label">Approved Volunteers</div></div>
+      <div class="metric-card"><span class="m-icon">🍛</span><div class="m-num">${stats.meals}</div><div class="m-label">Servings Listed</div></div>
+      <div class="metric-card"><span class="m-icon">⏳</span><div class="m-num">${pending.length}</div><div class="m-label">Pending Approvals</div></div>
+    </div>
+    
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:4px;flex-wrap:wrap">
+      <div class="table-wrap">
+        <div class="table-head"><h3>⏳ Pending Approvals</h3></div>
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>Type</th><th>Action</th></tr></thead>
+          <tbody>
+            ${pending.map(p => `<tr>
+              <td>${p.name}</td>
+              <td>${p.email}</td>
+              <td><span class="badge badge-amber">${p.type}</span></td>
+              <td><button class="btn-sm btn-green" onclick="handleAdminApprove('${p.id}', '${p.type}', '${p.name}')">Approve</button></td>
+            </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--text-muted)">No pending approvals</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+      <div class="table-wrap">
+        <div class="table-head"><h3>🍛 Recent Donations</h3></div>
+        <table>
+          <thead><tr><th>ID</th><th>Food</th><th>Status</th></tr></thead>
+          <tbody>${recent.map(d => `
+            <tr>
+              <td>FB-2024-${d.donation_id}</td>
+              <td>${d.food_name}</td>
+              <td><span class="badge ${d.status === 'available' ? 'badge-green' : d.status === 'requested' ? 'badge-amber' : 'badge-navy'}">${d.status}</span></td>
+            </tr>
+          `).join('') || '<tr><td colspan="3" style="text-align:center;color:var(--text-muted)">No donations posted yet</td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function handleAdminApprove(id, type, name) {
+  const res = LocalDB.approveUser(id, type);
+  if (res.success) {
+    document.getElementById('approveMsg').textContent = `${name} has been approved successfully!`;
+    showModal('approveModal');
+    renderAdminOverview();
+  } else {
+    alert(res.message);
+  }
+}
+
+function renderAdminTable(tab) {
+  let content = '';
+  if (tab === 'restaurants') {
+    const data = LocalDB.getTable('restaurants');
+    content = `
+      <h2 style="font-family:var(--font-display);font-size:24px;color:var(--navy);margin-bottom:20px">🍽️ Restaurants</h2>
+      <div class="table-wrap">
+        <div class="table-head"><h3>All Registered Restaurants</h3></div>
+        <table>
+          <thead><tr><th>ID</th><th>Name</th><th>Owner</th><th>Email</th><th>Phone</th><th>FSSAI</th><th>City</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody>
+            ${data.map(r => `<tr>
+              <td>${r.id}</td>
+              <td><strong>${r.name}</strong></td>
+              <td>${r.owner_name}</td>
+              <td>${r.email}</td>
+              <td>${r.phone}</td>
+              <td>${r.fssai_no}</td>
+              <td>${r.city}</td>
+              <td><span class="badge ${r.status === 'approved' ? 'badge-green' : 'badge-amber'}">${r.status}</span></td>
+              <td>
+                ${r.status === 'pending'
+                  ? `<button class="btn-sm btn-green" onclick="handleAdminApprove('${r.id}', 'restaurant', '${r.name}'); showAdminTab('restaurants');">Approve</button>`
+                  : `<span style="color:var(--text-muted);font-size:12px">Active</span>`}
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  } else if (tab === 'receivers') {
+    const data = LocalDB.getTable('receivers');
+    content = `
+      <h2 style="font-family:var(--font-display);font-size:24px;color:var(--navy);margin-bottom:20px">🏠 Receiver Organizations</h2>
+      <div class="table-wrap">
+        <div class="table-head"><h3>All Receiver Organizations</h3></div>
+        <table>
+          <thead><tr><th>ID</th><th>Org Name</th><th>Type</th><th>Rep Name</th><th>Email</th><th>Phone</th><th>Reg No</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody>
+            ${data.map(o => `<tr>
+              <td>${o.id}</td>
+              <td><strong>${o.org_name}</strong></td>
+              <td>${o.org_type}</td>
+              <td>${o.rep_name}</td>
+              <td>${o.email}</td>
+              <td>${o.phone}</td>
+              <td>${o.reg_no}</td>
+              <td><span class="badge ${o.status === 'approved' ? 'badge-green' : 'badge-amber'}">${o.status}</span></td>
+              <td>
+                ${o.status === 'pending'
+                  ? `<button class="btn-sm btn-green" onclick="handleAdminApprove('${o.id}', 'receiver', '${o.org_name}'); showAdminTab('receivers');">Approve</button>`
+                  : `<span style="color:var(--text-muted);font-size:12px">Active</span>`}
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  } else if (tab === 'volunteers') {
+    const data = LocalDB.getTable('volunteers');
+    content = `
+      <h2 style="font-family:var(--font-display);font-size:24px;color:var(--navy);margin-bottom:20px">🚴 Volunteers</h2>
+      <div class="table-wrap">
+        <div class="table-head"><h3>All Volunteers</h3></div>
+        <table>
+          <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>City</th><th>Vehicle</th><th>Availability</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody>
+            ${data.map(v => `<tr>
+              <td>${v.id}</td>
+              <td><strong>${v.first_name} ${v.last_name}</strong></td>
+              <td>${v.email}</td>
+              <td>${v.phone}</td>
+              <td>${v.city}</td>
+              <td>${v.vehicle_type}</td>
+              <td>${v.availability}</td>
+              <td><span class="badge ${v.status === 'approved' ? 'badge-green' : 'badge-amber'}">${v.status}</span></td>
+              <td>
+                ${v.status === 'pending'
+                  ? `<button class="btn-sm btn-green" onclick="handleAdminApprove('${v.id}', 'volunteer', '${v.first_name}'); showAdminTab('volunteers');">Approve</button>`
+                  : `<span style="color:var(--text-muted);font-size:12px">Active</span>`}
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  } else if (tab === 'donations') {
+    const data = LocalDB.getTable('donations');
+    content = `
+      <h2 style="font-family:var(--font-display);font-size:24px;color:var(--navy);margin-bottom:20px">🍛 Donations</h2>
+      <div class="table-wrap">
+        <div class="table-head"><h3>All Food Donations</h3></div>
+        <table>
+          <thead><tr><th>ID</th><th>Food Name</th><th>Qty</th><th>Type</th><th>Restaurant</th><th>City</th><th>Expiry</th><th>Status</th></tr></thead>
+          <tbody>
+            ${data.map(d => `<tr>
+              <td>FB-2024-${d.donation_id}</td>
+              <td><strong>${d.food_name}</strong></td>
+              <td>${d.quantity} servings</td>
+              <td>${d.food_type}</td>
+              <td>${d.restaurant_name}</td>
+              <td>${d.pickup_city}</td>
+              <td>${new Date(d.expiry_time).toLocaleString()}</td>
+              <td><span class="badge ${d.status === 'available' ? 'badge-green' : d.status === 'requested' ? 'badge-amber' : 'badge-navy'}">${d.status}</span></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  } else if (tab === 'deliveries') {
+    const data = LocalDB.getTable('deliveries');
+    content = `
+      <h2 style="font-family:var(--font-display);font-size:24px;color:var(--navy);margin-bottom:20px">📦 Deliveries</h2>
+      <div class="table-wrap">
+        <div class="table-head"><h3>All Deliveries</h3></div>
+        <table>
+          <thead><tr><th>Delivery ID</th><th>Donation ID</th><th>Receiver</th><th>Courier</th><th>Vehicle</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody>
+            ${data.map(d => `<tr>
+              <td>D-${String(d.delivery_id).padStart(3, '0')}</td>
+              <td>FB-2024-${d.donation_id}</td>
+              <td><strong>${d.receiver_name}</strong></td>
+              <td>${d.volunteer_name || '<span style="color:var(--coral)">Not Assigned</span>'}</td>
+              <td>${d.vehicle_type || '—'}</td>
+              <td><span class="badge ${d.status === 'delivered' ? 'badge-green' : 'badge-amber'}">${d.status}</span></td>
+              <td>
+                <button class="btn-sm btn-outline-sm" onclick="showTrackItem(${d.donation_id})">Track</button>
+                ${d.volunteer_name === null ? `<button class="btn-sm btn-green" onclick="assignDemoVolunteer(${d.delivery_id})">Assign Volunteer</button>` : ''}
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+  document.getElementById('adminContent').innerHTML = content;
+}
+
+function assignDemoVolunteer(deliveryId) {
+  const deliveries = LocalDB.getTable('deliveries');
+  const d = deliveries.find(x => x.delivery_id == deliveryId);
+  if (d) {
+    const v = LocalDB.getTable('volunteers')[0]; // Assign first volunteer (Ravi Kumar)
+    d.volunteer_id = v.id;
+    d.volunteer_name = v.first_name + ' ' + v.last_name;
+    d.vehicle_type = v.vehicle_type;
+    d.status = 'assigned';
+    d.notes = 'Volunteer Ravi Kumar assigned for pickup';
+    LocalDB.saveTable('deliveries', deliveries);
+    showAdminTab('deliveries');
+    alert("Demo Volunteer successfully assigned!");
+  }
+}
+
+// ─── MODALS ───
+function showModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ─── INITIALIZATION ───
+window.addEventListener('load', () => {
+  LocalDB.init();
+  updateNavBar();
+  showPage('home');
+});
+</script>
+</body>
+</html>
